@@ -1,0 +1,35 @@
+{
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-recommended"
+    ],
+    "rules": {
+        "at-rule-no-unknown": [
+            true,
+            {
+                "ignoreAtRules": [
+                    "tailwind",
+                    "apply",
+                    "variants",
+                    "responsive",
+                    "screen",
+                    "layer"
+                ]
+            }
+        ],
+        "property-no-vendor-prefix": null,
+        "value-keyword-case": null,
+        "media-feature-range-notation": null,
+        "rule-empty-line-before": null,
+        "declaration-block-no-redundant-longhand-properties": null,
+        "declaration-property-value-no-unknown": null,
+        "comment-empty-line-before": null,
+        "custom-property-empty-line-before": null,
+        "declaration-empty-line-before": null,
+        "declaration-block-trailing-semicolon": "always",
+        "at-rule-no-deprecated": null,
+        "no-descending-specificity": null,
+        "selector-class-pattern": null,
+        "keyframes-name-pattern": null
+    }
+}

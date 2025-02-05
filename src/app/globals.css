@@ -2,20 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Brand Colors */
+    --brand-primary: 24 110 188;
+    --brand-secondary: 44 46 53;
+
+    /* Base Colors */
+    --background: 255 255 255;
+    --foreground: 44 46 53;
+
+    /* UI Colors */
+    --muted: 245 245 245;
+    --muted-foreground: 115 115 115;
+
+    /* Accent Colors */
+    --accent: 24 110 188;
+    --accent-foreground: 255 255 255;
+
+    /* Utility Colors */
+    --border: 229 229 229;
+    --input: 229 229 229;
+    --ring: 24 110 188;
+
+    /* Sizing */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Base Colors - Dark Mode */
+    --background: 13 13 13;
+    --foreground: 250 250 250;
+
+    /* UI Colors - Dark Mode */
+    --muted: 28 28 28;
+    --muted-foreground: 163 163 163;
+
+    /* Accent Colors - Dark Mode */
+    --accent: 24 110 188;
+    --accent-foreground: 255 255 255;
+
+    /* Utility Colors - Dark Mode */
+    --border: 38 38 38;
+    --input: 38 38 38;
+    --ring: 24 110 188;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* Base Styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+  }
+
+  button {
+    appearance: none;
+    border-radius: 0;
+    background: none;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+
+  /* iOS Specific */
+  @supports (-webkit-touch-callout: none) {
+    .min-h-screen {
+      min-height: -webkit-fill-available;
+    }
+  }
+
+  /* Safe Area Support */
+  .safe-area {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .ios-safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Scrolling Container */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+}
+
+/* Media Queries */
+@media (orientation: landscape) {
+  html {
+    -webkit-text-size-adjust: none;
+  }
+}
+
+@media (max-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-accent/70 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent;
 }
