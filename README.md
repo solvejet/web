@@ -48,7 +48,7 @@ A fully optimized Next.js application template with built-in SEO, analytics, per
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/solvejet/solvejet.git
+git clone https://github.com/solvejet/web.git
 cd solvejet
 ```
 
@@ -234,4 +234,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Website: [solvejet.net](https://solvejet.net)
 - Twitter: [@karansxa](https://twitter.com/karansxa)
-- Email: your.email@example.com
+- Email: karan@solvejet.net

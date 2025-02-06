@@ -1,4 +1,3 @@
-// tailwind.config.ts
 import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
@@ -17,14 +16,18 @@ const config: Config = {
       center: true,
       padding: '2rem',
       screens: {
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
         '2xl': '1400px',
       },
     },
     extend: {
       // Colors
       colors: {
-        'brand-primary': 'rgb(var(--brand-primary) / <alpha-value>)',
-        'brand-secondary': 'rgb(var(--brand-secondary) / <alpha-value>)',
+        'brand-primary': 'rgb(var(--brand-primary) / <alpha-value>)', // #001926
+        'brand-secondary': 'rgb(var(--brand-secondary) / <alpha-value>)', // #00629D
         background: 'rgb(var(--background) / <alpha-value>)',
         foreground: 'rgb(var(--foreground) / <alpha-value>)',
         muted: {
@@ -39,7 +42,6 @@ const config: Config = {
         input: 'rgb(var(--input) / <alpha-value>)',
         ring: 'rgb(var(--ring) / <alpha-value>)',
       },
-      // Border Radius
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -52,12 +54,15 @@ const config: Config = {
       // Height
       height: {
         dvh: '100dvh',
+        screen: '100vh',
       },
       minHeight: {
         dvh: '100dvh',
+        screen: '100vh',
       },
       maxHeight: {
         dvh: '100dvh',
+        screen: '100vh',
       },
       // Animations
       keyframes: {
@@ -77,12 +82,18 @@ const config: Config = {
           '0%': { transform: 'translateY(100%)' },
           '100%': { transform: 'translateY(0)' },
         },
+        // Added new animation for smooth transitions
+        'scale-in': {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out',
         'fade-out': 'fade-out 0.5s ease-in-out',
         'slide-in-from-top': 'slide-in-from-top 0.3s ease-out',
         'slide-in-from-bottom': 'slide-in-from-bottom 0.3s ease-out',
+        'scale-in': 'scale-in 0.2s ease-out',
       },
       // Safe Area
       padding: {
@@ -90,6 +101,14 @@ const config: Config = {
         'safe-bottom': 'env(safe-area-inset-bottom)',
         'safe-left': 'env(safe-area-inset-left)',
         'safe-right': 'env(safe-area-inset-right)',
+      },
+      // Added transition utilities
+      transitionTimingFunction: {
+        'in-expo': 'cubic-bezier(0.95, 0.05, 0.795, 0.035)',
+        'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
+      },
+      backgroundColor: {
+        'background/80': 'rgb(var(--background) / 0.8)',
       },
     },
   },

@@ -1,17 +1,43 @@
-// src/app/api/csrf/route.ts - CSRF token endpoint
+// src/app/api/csrf/route.ts
 import { NextResponse } from 'next/server';
 import { setCsrfToken } from '@/utils/csrf';
 
 export async function GET() {
-  const response = new NextResponse(JSON.stringify({ message: 'CSRF token set' }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const response = NextResponse.json(
+      { message: 'CSRF token set' },
+      {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin':
+            process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000',
+          'Access-Control-Allow-Credentials': 'true',
+        },
+      }
+    );
 
-  const token = setCsrfToken(response);
-  response.headers.set('x-csrf-token', token);
+    const token = setCsrfToken(response);
+    response.headers.set('X-CSRF-Token', token);
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error('Error setting CSRF token:', error);
+    return NextResponse.json({ error: 'Failed to set CSRF token' }, { status: 500 });
+  }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json(
+    {},
+    {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin':
+          process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token',
+        'Access-Control-Allow-Credentials': 'true',
+      },
+    }
+  );
 }

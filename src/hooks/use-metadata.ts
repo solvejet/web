@@ -22,7 +22,7 @@ export const useMetadata = () => {
       suffix = '| SolveJet',
     } = options;
 
-    const finalTitle = title ? `${title} ${suffix}` : 'SolveJet - Your Application';
+    const finalTitle = title ? `${title} ${suffix}` : 'SolveJet - ISO certified Custom Software Development Company';
     const siteUrl = process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000';
     const imageUrl = image ? `${siteUrl}${image}` : `${siteUrl}/og-image.png`;
 

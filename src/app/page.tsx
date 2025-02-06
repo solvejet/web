@@ -1,12 +1,9 @@
 // src/app/page.tsx
 'use client';
 
-import Image from 'next/image';
-import { useImageOptimization } from '@/hooks/use-image-optimization';
 import { usePerformance } from '@/hooks/use-performance';
 
 export default function ClientHome() {
-  const { lazyLoadImage } = useImageOptimization();
   const { measureUserInteraction } = usePerformance();
 
   return (
@@ -37,21 +34,6 @@ export default function ClientHome() {
             </li>
           </ul>
         </section>
-
-        {/* Example of optimized image usage */}
-        <div className="relative aspect-video overflow-hidden rounded-lg">
-          <Image
-            src="/solvejet.png"
-            alt="Example"
-            className="object-cover"
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={false}
-            onLoad={(event) => {
-              lazyLoadImage(event.target as HTMLImageElement);
-            }}
-          />
-        </div>
       </main>
 
       {/* Example of performance measurement for user interactions */}

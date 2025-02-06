@@ -1,6 +1,9 @@
 // src/utils/api.ts
 let csrfInitialized = false;
 let csrfInitializationPromise: Promise<void> | null = null;
+let initializationAttempts = 0;
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY = 1000;
 
 async function initializeCsrf(): Promise<void> {
   if (csrfInitialized) return;
@@ -9,18 +12,43 @@ async function initializeCsrf(): Promise<void> {
     return csrfInitializationPromise;
   }
 
+  if (initializationAttempts >= MAX_ATTEMPTS) {
+    throw new Error('Max CSRF initialization attempts reached');
+  }
+
   csrfInitializationPromise = new Promise<void>(async (resolve, reject) => {
     try {
-      const response = await fetch('/api/csrf');
+      initializationAttempts++;
+      const response = await fetch('/api/csrf', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch CSRF token');
       }
-      // Wait a bit for the cookie to be set
+
+      // Wait for cookies to be set
       await new Promise((r) => setTimeout(r, 100));
+
+      const tokenCookie = document.cookie.split('; ').find((row) => row.startsWith('csrf-token='));
+
+      if (!tokenCookie) {
+        if (initializationAttempts < MAX_ATTEMPTS) {
+          await new Promise((r) => setTimeout(r, RETRY_DELAY));
+          csrfInitializationPromise = null;
+          return initializeCsrf();
+        }
+        throw new Error('CSRF token not set in cookies');
+      }
+
       csrfInitialized = true;
       resolve();
     } catch (error) {
-      console.warn('CSRF initialization failed:', error);
+      console.error('CSRF initialization failed:', error);
+      csrfInitialized = false;
       reject(error);
     } finally {
       csrfInitializationPromise = null;
@@ -31,55 +59,38 @@ async function initializeCsrf(): Promise<void> {
 }
 
 export async function fetchWithCsrf(url: string, options: RequestInit = {}): Promise<Response> {
-  try {
-    // Initialize CSRF if needed
-    if (!csrfInitialized) {
-      await initializeCsrf();
-    }
+  if (!csrfInitialized) {
+    await initializeCsrf();
+  }
 
-    // Get the CSRF token from cookie
-    const csrfToken = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('csrf-token='))
-      ?.split('=')[1];
+  const csrfToken = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('csrf-token='))
+    ?.split('=')[1];
 
-    if (!csrfToken) {
-      throw new Error('CSRF token not found in cookies');
-    }
+  if (!csrfToken) {
+    throw new Error('CSRF token not found');
+  }
 
-    // Create headers with type safety
-    const headers = new Headers(options.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('X-CSRF-Token', csrfToken);
+  const headers = new Headers(options.headers);
+  headers.set('Content-Type', 'application/json');
+  headers.set('X-CSRF-Token', csrfToken);
 
-    // Return fetch with properly typed headers
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
+  const response = await fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers,
+  });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response;
-  } catch (error) {
-    // If CSRF token is missing, try to reinitialize once
-    if (
-      error instanceof Error &&
-      error.message === 'CSRF token not found in cookies' &&
-      csrfInitialized
-    ) {
+  if (!response.ok) {
+    if (response.status === 403) {
+      // Reset CSRF state and retry once
       csrfInitialized = false;
+      await initializeCsrf();
       return fetchWithCsrf(url, options);
     }
-    throw error;
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
-}
 
-// Type-safe wrapper for JSON responses
-export async function fetchWithCsrfJson<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetchWithCsrf(url, options);
-  return response.json() as Promise<T>;
+  return response;
 }

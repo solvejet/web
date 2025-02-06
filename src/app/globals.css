@@ -5,25 +5,55 @@
 @layer base {
   :root {
     /* Brand Colors */
-    --brand-primary: 24 110 188;
-    --brand-secondary: 44 46 53;
+    --brand-primary: 0 25 38;
+    /* #001926 - Primary blue */
+    --brand-secondary: 0 98 157;
+    /* #00629D - Darker blue */
 
-    /* Base Colors */
+    /* Base Colors - Light Mode */
     --background: 255 255 255;
-    --foreground: 44 46 53;
+    /* #FFFFFF - Pure white */
+    --foreground: 51 51 51;
+    /* #333333 - Soft black for text */
 
-    /* UI Colors */
-    --muted: 245 245 245;
-    --muted-foreground: 115 115 115;
+    /* UI Colors - Light Mode */
+    --muted: 247 249 251;
+    /* #F7F9FB - Very light blue-gray */
+    --muted-foreground: 107 114 128;
+    /* #6B7280 - Muted text */
 
     /* Accent Colors */
-    --accent: 24 110 188;
+    --accent: 0 25 38;
+    /* #001926 - Same as brand-primary */
     --accent-foreground: 255 255 255;
+    /* #FFFFFF - White text on accent */
 
     /* Utility Colors */
-    --border: 229 229 229;
-    --input: 229 229 229;
-    --ring: 24 110 188;
+    --border: 229 233 240;
+    /* #E5E9F0 - Light border */
+    --input: 229 233 240;
+    /* #E5E9F0 - Light input */
+    --ring: 0 124 199;
+    /* #007CC7 - Focus ring */
+
+    --consulting: #FF6B6B;
+    /* Coral */
+    --software: #4ECDC4;
+    /* Turquoise */
+    --mvp: #45B7D1;
+    /* Sky Blue */
+    --staff: #96CEB4;
+    /* Sage */
+    --web: #7367F0;
+    /* Purple */
+    --ai: #28C76F;
+    /* Green */
+    --cloud: #FF9F43;
+    /* Orange */
+    --mobile: #EA5455;
+    /* Red */
+    --blockchain: #624CAB;
+    /* Deep Purple */
 
     /* Sizing */
     --radius: 0.5rem;
@@ -31,26 +61,39 @@
 
   .dark {
     /* Base Colors - Dark Mode */
-    --background: 13 13 13;
-    --foreground: 250 250 250;
+    --background: 13 17 23;
+    /* #0D1117 - GitHub-style dark background */
+    --foreground: 230 237 243;
+    /* #E6EDF3 - Soft white for text */
 
     /* UI Colors - Dark Mode */
-    --muted: 28 28 28;
-    --muted-foreground: 163 163 163;
+    --muted: 22 27 34;
+    /* #161B22 - Slightly lighter than bg */
+    --muted-foreground: 139 148 158;
+    /* #8B949E - Muted text */
 
     /* Accent Colors - Dark Mode */
-    --accent: 24 110 188;
+    --accent: 40 65 78;
+    /* #28414E - Darker blue-gray */
     --accent-foreground: 255 255 255;
+    /* #FFFFFF - White text on accent */
 
     /* Utility Colors - Dark Mode */
-    --border: 38 38 38;
-    --input: 38 38 38;
-    --ring: 24 110 188;
+    --border: 33 38 45;
+    /* #21262D - Subtle dark borders */
+    --input: 33 38 45;
+    /* #21262D - Input fields */
+    --ring: 40 65 78;
+    /* #28414E - Focus ring matching accent */
   }
 }
 
 /* Base Styles */
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -73,6 +116,64 @@
     appearance: none;
     border-radius: 0;
     background: none;
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--accent) / 0.2);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--accent) / 0.4);
+  border-width: 1px;
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--accent) / 0.2) transparent;
+}
+
+/* Custom Cursor Styles */
+.cursor-custom {
+  cursor: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  body:has(.cursor-custom),
+  .cursor-custom a,
+  .cursor-custom button,
+  .cursor-custom [role='button'],
+  .cursor-custom input[type='submit'],
+  .cursor-custom input[type='reset'],
+  .cursor-custom input[type='button'] {
+    cursor: none;
+  }
+
+  .cursor-custom input,
+  .cursor-custom textarea,
+  .cursor-custom select {
+    cursor: text !important;
+  }
+
+  .cursor-custom iframe {
+    cursor: auto !important;
   }
 }
 
@@ -129,19 +230,8 @@
   }
 }
 
-/* Scrollbar Styles */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-muted;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-accent/70 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-accent;
+@layer components {
+  .group:hover {
+    background-color: var(--hover-bg) !important;
+  }
 }

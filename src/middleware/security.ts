@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import Tokens from 'csrf';
 import { randomBytes } from 'crypto';
+import { validateCsrfTokenPair } from '@/utils/csrf';
 
 // Rate limiter setup
 const rateLimiter = new RateLimiterMemory({
@@ -56,21 +57,24 @@ const getClientIp = (request: NextRequest): string => {
 // Validate CSRF token
 export async function validateCsrfToken(req: NextRequest): Promise<NextResponse | null> {
   const token = req.headers.get('x-csrf-token');
-  const cookie = req.cookies.get('csrf-token');
+  const secretCookie = req.cookies.get('csrf-secret');
+  const tokenCookie = req.cookies.get('csrf-token');
 
-  if (!token || !cookie?.value) {
+  if (!token || !secretCookie?.value || !tokenCookie?.value) {
     return NextResponse.json({ error: 'Missing CSRF token' }, { status: 403 });
   }
 
-  try {
-    const isValid = tokens.verify(cookie.value, token);
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
-    }
-    return null;
-  } catch {
+  // Verify that the token in the header matches the cookie token
+  if (token !== tokenCookie.value) {
     return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
   }
+
+  // Validate token with secret
+  if (!validateCsrfTokenPair(secretCookie.value, token)) {
+    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+  }
+
+  return null;
 }
 
 // API Security Middleware

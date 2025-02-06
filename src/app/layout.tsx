@@ -1,10 +1,11 @@
 // src/app/layout.tsx
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
 import { Poppins } from 'next/font/google';
 import Analytics from '@/components/Analytics';
 import { ThemeProvider } from '@/components/theme-provider';
 import '@/app/globals.css';
+import Header from '@/components/layout/Header';
+import type { PropsWithChildren } from 'react';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -13,11 +14,10 @@ const poppins = Poppins({
   display: 'swap',
 });
 
-// Default metadata
 export const metadata: Metadata = {
   metadataBase: new URL(process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'),
   title: {
-    default: 'SolveJet - Your Application',
+    default: 'SolveJet - Custom Software Development Company',
     template: '%s | SolveJet',
   },
   description: 'Next.js application with full SEO, analytics, and performance optimization',
@@ -64,30 +64,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Get analytics IDs with type safety
-  const analyticsIds = {
-    GA_MEASUREMENT_ID: process.env['NEXT_PUBLIC_GA_ID'] ?? undefined,
-    GTM_ID: process.env['NEXT_PUBLIC_GTM_ID'] ?? undefined,
-    LINKEDIN_ID: process.env['NEXT_PUBLIC_LINKEDIN_ID'] ?? undefined,
-  };
-
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} min-h-dvh bg-background font-sans antialiased`}>
+      <head />
+      <body
+        className={`${poppins.variable} min-h-dvh bg-background font-sans antialiased overflow-x-hidden`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           storageKey="solvejet-theme"
         >
-          {/* Main content */}
-          <main className="relative flex min-h-dvh flex-col">{children}</main>
-
-          {/* Analytics with Suspense for better performance */}
-          <Suspense fallback={null}>
-            <Analytics {...analyticsIds} />
-          </Suspense>
+          <div className="relative flex min-h-dvh flex-col overflow-x-hidden">
+            <Header />
+            <main className="flex-1 mt-[105px]">{children}</main>
+            <Analytics />
+          </div>
         </ThemeProvider>
       </body>
     </html>
