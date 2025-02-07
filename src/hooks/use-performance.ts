@@ -3,7 +3,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { fetchWithCsrf } from '@/utils/api';
+import { analyticsQueue } from '@/utils/analytics-queue';
 
 type MetricType = 'CLS' | 'FID' | 'LCP' | 'FCP' | 'TTFB';
 
@@ -21,14 +21,9 @@ interface CustomPerformanceEntry extends PerformanceEntry {
   hadRecentInput?: boolean;
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 5000;
-
 export const usePerformance = () => {
   const pathname = usePathname();
-  const metricsQueue = useRef<Array<{ metric: PerformanceMetric; retries: number }>>([]);
-  const isProcessing = useRef(false);
-  const processingTimeout = useRef<NodeJS.Timeout>();
+  const metricsRef = useRef<Set<string>>(new Set());
 
   const getRating = (name: MetricType, value: number): 'good' | 'needs-improvement' | 'poor' => {
     switch (name) {
@@ -47,63 +42,25 @@ export const usePerformance = () => {
     }
   };
 
-  const processMetricsQueue = useCallback(async () => {
-    if (isProcessing.current || metricsQueue.current.length === 0) return;
-
-    isProcessing.current = true;
-    if (processingTimeout.current) {
-      clearTimeout(processingTimeout.current);
-    }
-
-    try {
-      const currentMetrics = [...metricsQueue.current];
-      metricsQueue.current = [];
-
-      for (const { metric, retries } of currentMetrics) {
-        try {
-          await fetchWithCsrf('/api/analytics', {
-            method: 'POST',
-            body: JSON.stringify({
-              type: 'performance',
-              payload: {
-                metric: metric.name,
-                value: metric.value,
-                rating: metric.rating,
-                pathname,
-                timestamp: new Date().toISOString(),
-              },
-            }),
-          });
-        } catch (error) {
-          console.warn('Error reporting metric:', metric.name, error);
-
-          // Only retry if we haven't exceeded max retries
-          if (retries < MAX_RETRIES) {
-            metricsQueue.current.push({
-              metric,
-              retries: retries + 1,
-            });
-          }
-        }
-      }
-    } finally {
-      isProcessing.current = false;
-
-      // If there are still items in the queue, schedule next processing
-      if (metricsQueue.current.length > 0) {
-        processingTimeout.current = setTimeout(() => {
-          void processMetricsQueue();
-        }, RETRY_DELAY);
-      }
-    }
-  }, [pathname]);
-
   const reportWebVital = useCallback(
     (metric: PerformanceMetric) => {
-      metricsQueue.current.push({ metric, retries: 0 });
-      void processMetricsQueue();
+      // Prevent duplicate metrics
+      const metricKey = `${metric.name}-${pathname}`;
+      if (metricsRef.current.has(metricKey)) return;
+      metricsRef.current.add(metricKey);
+
+      analyticsQueue.enqueue('/api/analytics', {
+        type: 'performance',
+        payload: {
+          metric: metric.name,
+          value: metric.value,
+          rating: metric.rating,
+          pathname,
+          timestamp: new Date().toISOString(),
+        },
+      });
     },
-    [processMetricsQueue]
+    [pathname]
   );
 
   useEffect(() => {
@@ -133,9 +90,6 @@ export const usePerformance = () => {
     }
 
     return () => {
-      if (processingTimeout.current) {
-        clearTimeout(processingTimeout.current);
-      }
       try {
         observer.disconnect();
       } catch (error) {
@@ -151,16 +105,19 @@ export const usePerformance = () => {
       return () => {
         const duration = performance.now() - startTime;
 
-        reportWebVital({
-          name: 'FID',
-          value: duration,
-          rating: getRating('FID', duration),
-          delta: duration,
-          id: `${eventType}-${Date.now()}`,
+        analyticsQueue.enqueue('/api/analytics', {
+          type: 'performance',
+          payload: {
+            metric: 'UserInteraction',
+            event: eventType,
+            value: duration,
+            pathname,
+            timestamp: new Date().toISOString(),
+          },
         });
       };
     },
-    [reportWebVital]
+    [pathname]
   );
 
   return { measureUserInteraction };

@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 import WhatWeDo from './MegaMenu/WhatWeDo';
 import Industries from './MegaMenu/Industries';
 import Technologies from './MegaMenu/Technologies';
+import Company from './MegaMenu/Company';
 
 export type MenuId = 'what-we-do' | 'industries' | 'technologies' | 'company' | 'case-studies';
 
@@ -20,20 +21,20 @@ const SkipToContent = () => (
   </a>
 );
 
-const Header = () => {
+export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = 'main-mega-menu';
 
-  const handleMenuOpen = (menu: MenuId) => {
+  const handleMenuOpenAction = (menu: MenuId) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     setOpenMenu(menu);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeaveAction = () => {
     timeoutRef.current = setTimeout(() => {
       setOpenMenu(null);
     }, 150);
@@ -43,13 +44,17 @@ const Header = () => {
     <>
       <SkipToContent />
       <header
-        className="sticky top-0 w-full z-50 bg-background"
+        className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
         role="banner"
         aria-label="Main header"
       >
         <Topbar />
         <div ref={menuRef} className="relative">
-          <Navbar openMenu={openMenu} onMenuOpen={handleMenuOpen} onMouseLeave={handleMouseLeave} />
+          <Navbar
+            openMenu={openMenu}
+            onMenuOpenAction={handleMenuOpenAction}
+            onMouseLeaveAction={handleMouseLeaveAction}
+          />
 
           {/* Mega Menu Container */}
           <div
@@ -64,28 +69,26 @@ const Header = () => {
                 clearTimeout(timeoutRef.current);
               }
             }}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={handleMouseLeaveAction}
             style={{
               transition: 'opacity 0.2s ease-in-out',
             }}
           >
-            {openMenu === 'what-we-do' && (
-              <WhatWeDo
-                isOpen={true}
-                menuId={menuId}
-                onClose={function (): void {
-                  throw new Error('Function not implemented.');
-                }}
-              />
-            )}
-            {openMenu === 'industries' && <Industries isOpen={true} menuId={menuId} />}
-            {openMenu === 'technologies' && <Technologies isOpen={true} menuId={menuId} />}
+            {/* Desktop Mega Menus - Only shown on desktop */}
+            <div className="hidden md:block">
+              {openMenu === 'what-we-do' && (
+                <WhatWeDo isOpen={true} menuId={menuId} onClose={() => setOpenMenu(null)} />
+              )}
+              {openMenu === 'industries' && <Industries isOpen={true} menuId={menuId} />}
+              {openMenu === 'technologies' && <Technologies isOpen={true} menuId={menuId} />}
+              {openMenu === 'company' && <Company isOpen={true} menuId={menuId} />}
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Add spacer for fixed header */}
+      <div className="h-[105px]" aria-hidden="true" />
     </>
   );
-};
-
-// Prevent unnecessary re-renders
-export default Header;
+}

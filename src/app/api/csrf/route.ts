@@ -12,6 +12,9 @@ export async function GET() {
           'Access-Control-Allow-Origin':
             process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000',
           'Access-Control-Allow-Credentials': 'true',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
       }
     );
@@ -22,7 +25,17 @@ export async function GET() {
     return response;
   } catch (error) {
     console.error('Error setting CSRF token:', error);
-    return NextResponse.json({ error: 'Failed to set CSRF token' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to set CSRF token' },
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   }
 }
 
@@ -37,6 +50,9 @@ export async function OPTIONS() {
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token',
         'Access-Control-Allow-Credentials': 'true',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     }
   );

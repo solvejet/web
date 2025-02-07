@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
   headers.set('X-Frame-Options', 'DENY');
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   headers.set('X-XSS-Protection', '1; mode=block');
   headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 

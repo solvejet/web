@@ -35,26 +35,6 @@
     /* #E5E9F0 - Light input */
     --ring: 0 124 199;
     /* #007CC7 - Focus ring */
-
-    --consulting: #FF6B6B;
-    /* Coral */
-    --software: #4ECDC4;
-    /* Turquoise */
-    --mvp: #45B7D1;
-    /* Sky Blue */
-    --staff: #96CEB4;
-    /* Sage */
-    --web: #7367F0;
-    /* Purple */
-    --ai: #28C76F;
-    /* Green */
-    --cloud: #FF9F43;
-    /* Orange */
-    --mobile: #EA5455;
-    /* Red */
-    --blockchain: #624CAB;
-    /* Deep Purple */
-
     /* Sizing */
     --radius: 0.5rem;
   }

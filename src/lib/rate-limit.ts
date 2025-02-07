@@ -13,12 +13,18 @@ interface RateLimitResponse {
 // Create separate limiters for different endpoints
 const limiters = {
   analytics: new RateLimiterMemory({
-    points: 100, // Number of points
+    points: 500, // Increased from 100
     duration: 60, // Per minute
+    blockDuration: 1, // Only block for 1 second
+  }),
+  performance: new RateLimiterMemory({
+    points: 1000, // Higher limit for performance metrics
+    duration: 60,
+    blockDuration: 1,
   }),
   default: new RateLimiterMemory({
-    points: 50, // Number of points
-    duration: 60, // Per minute
+    points: 50,
+    duration: 60,
   }),
 } as const;
 
@@ -26,30 +32,36 @@ type LimiterKey = keyof typeof limiters;
 
 // Get client IP helper
 const getClientIp = (request: NextRequest): string => {
-  const forwardedFor = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  if (forwardedFor) {
-    return forwardedFor;
-  }
-
+  const forwardedFor = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
-  if (realIp) {
-    return realIp;
-  }
 
-  return '127.0.0.1';
+  return forwardedFor?.split(',')[0]?.trim() ?? realIp ?? '127.0.0.1';
 };
 
 /**
- * Rate limit middleware
- * @param request - Next.js request object
- * @param endpoint - Endpoint identifier for different rate limits (optional)
- * @returns RateLimitResponse object
+ * Rate limit middleware with path-based limits
  */
 export async function rateLimit(
   request: NextRequest,
   endpoint: LimiterKey = 'default'
 ): Promise<RateLimitResponse> {
   const ip = getClientIp(request);
+  const path = request.nextUrl.pathname;
+
+  // Use performance limiter for performance metrics
+  if (path.includes('/api/analytics') && request.method === 'POST') {
+    try {
+      const body = await request.json();
+      if (body.type === 'performance') {
+        endpoint = 'performance';
+      } else {
+        endpoint = 'analytics';
+      }
+    } catch {
+      endpoint = 'analytics';
+    }
+  }
+
   const limiter = limiters[endpoint];
 
   try {
@@ -77,19 +89,22 @@ export async function rateLimit(
  * Helper function to create rate-limited response
  */
 export function createRateLimitResponse(result: RateLimitResponse) {
-  const headers = new Headers({
+  const headers = {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
     'X-RateLimit-Reset': result.reset.toString(),
-  });
+  };
 
   if (!result.success) {
     return NextResponse.json(
-      { error: 'Too Many Requests' },
+      {
+        error: 'Too Many Requests',
+        retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
+      },
       {
         status: 429,
         headers: {
-          ...Object.fromEntries(headers),
+          ...headers,
           'Retry-After': Math.ceil((result.reset - Date.now()) / 1000).toString(),
         },
       }
@@ -98,24 +113,3 @@ export function createRateLimitResponse(result: RateLimitResponse) {
 
   return headers;
 }
-
-/**
- * Example usage in an API route:
- *
- * export async function POST(req: NextRequest) {
- *   const rateResult = await rateLimit(req, 'analytics');
- *
- *   if (!rateResult.success) {
- *     return createRateLimitResponse(rateResult);
- *   }
- *
- *   const headers = createRateLimitResponse(rateResult);
- *
- *   // Your API logic here
- *   const data = await processRequest(req);
- *
- *   return NextResponse.json(data, {
- *     headers: Object.fromEntries(headers),
- *   });
- * }
- */
