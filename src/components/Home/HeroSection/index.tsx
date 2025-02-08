@@ -6,9 +6,7 @@ import { gsap } from 'gsap';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { ArrowUpRight, Code, Rocket, Shield, Users } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import type { Metadata } from 'next';
 
-// Feature data for better code organization and maintainability
 const features = [
   {
     icon: Code,
@@ -32,30 +30,6 @@ const features = [
   },
 ] as const;
 
-// Pre-defined animation settings for consistency
-const ANIMATION_SETTINGS = {
-  defaultEase: 'power2.out',
-  staggerDelay: 0.1,
-  duration: {
-    orbs: 1,
-    text: 0.6,
-    buttons: 0.4,
-    features: 0.5,
-  },
-} as const;
-
-export const metadata: Metadata = {
-  title: 'SolveJet - Custom Software Development Solutions',
-  description:
-    'From startup visions to enterprise solutions, we blend technical expertise with creative innovation.',
-  keywords: [
-    'software development',
-    'custom solutions',
-    'enterprise security',
-    'digital transformation',
-  ],
-};
-
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -63,71 +37,20 @@ const HeroSection = () => {
   useEffect(() => {
     if (!sectionRef.current || typeof window === 'undefined') return;
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: {
-          ease: ANIMATION_SETTINGS.defaultEase,
-          clearProps: 'transform,opacity',
-        },
-      });
+    // Immediately show content
+    gsap.set(['.hero-title', '.hero-description', '.cta-button', '.feature-card'], {
+      opacity: 1,
+      y: 0,
+    });
 
-      // Animation sequence remains the same
-      tl.fromTo(
-        '.gradient-orb',
-        { scale: 0.9, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          duration: ANIMATION_SETTINGS.duration.orbs,
-          stagger: ANIMATION_SETTINGS.staggerDelay,
-        }
-      )
-        .fromTo(
-          '.hero-title .word',
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION_SETTINGS.duration.text,
-            stagger: ANIMATION_SETTINGS.staggerDelay,
-          },
-          '-=0.4'
-        )
-        .fromTo(
-          '.hero-description',
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION_SETTINGS.duration.text,
-          },
-          '-=0.2'
-        )
-        .fromTo(
-          '.cta-button',
-          { y: 10, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION_SETTINGS.duration.buttons,
-            stagger: ANIMATION_SETTINGS.staggerDelay,
-          },
-          '-=0.2'
-        )
-        .fromTo(
-          '.feature-card',
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: ANIMATION_SETTINGS.duration.features,
-            stagger: ANIMATION_SETTINGS.staggerDelay,
-          },
-          '-=0.2'
-        );
-    }, sectionRef);
-
-    return () => ctx.revert();
+    // Animate background elements with minimal delay
+    gsap.to('.gradient-orb', {
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+      ease: 'power2.out',
+      stagger: 0.1,
+    });
   }, []);
 
   return (
@@ -136,11 +59,20 @@ const HeroSection = () => {
       className="relative min-h-[85vh] overflow-hidden px-4 pt-16"
       aria-label="Hero section"
     >
-      {/* Background Elements */}
+      {/* Background Elements - Prerendered with initial opacity */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="gradient-orb absolute -left-20 top-20 h-72 w-72 rounded-full bg-gradient-to-r from-[#FF8BAE]/20 to-[#C400FF]/20 blur-2xl" />
-        <div className="gradient-orb absolute right-10 top-40 h-64 w-64 rounded-full bg-gradient-to-r from-[#00E1FF]/20 to-[#0047FF]/20 blur-2xl" />
-        <div className="gradient-orb absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-gradient-to-r from-[#FFB800]/20 to-[#FF5C00]/20 blur-2xl" />
+        <div
+          className="gradient-orb absolute -left-20 top-20 h-72 w-72 rounded-full bg-gradient-to-r from-[#FF8BAE]/20 to-[#C400FF]/20 blur-2xl opacity-0"
+          style={{ transform: 'scale(0.9)' }}
+        />
+        <div
+          className="gradient-orb absolute right-10 top-40 h-64 w-64 rounded-full bg-gradient-to-r from-[#00E1FF]/20 to-[#0047FF]/20 blur-2xl opacity-0"
+          style={{ transform: 'scale(0.9)' }}
+        />
+        <div
+          className="gradient-orb absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-gradient-to-r from-[#FFB800]/20 to-[#FF5C00]/20 blur-2xl opacity-0"
+          style={{ transform: 'scale(0.9)' }}
+        />
       </div>
 
       {/* Grid Pattern Overlay */}
@@ -155,16 +87,12 @@ const HeroSection = () => {
         aria-hidden="true"
       />
 
-      {/* Main Content */}
+      {/* Main Content - Prerendered without initial transforms */}
       <div className="relative mx-auto max-w-6xl">
         <div className="hero-content text-center">
           <h1 className="hero-title text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            {['Crafting', 'Digital', 'Excellence', 'with'].map((word, i) => (
-              <span key={i} className="word mx-1 inline-block">
-                {word}
-              </span>
-            ))}
-            <span className="word block bg-gradient-to-r from-[#FF8BAE] to-[#0047FF] bg-clip-text text-transparent">
+            Crafting Digital Excellence with{' '}
+            <span className="block bg-gradient-to-r from-[#FF8BAE] to-[#0047FF] bg-clip-text text-transparent">
               Innovation & Precision
             </span>
           </h1>
@@ -175,13 +103,13 @@ const HeroSection = () => {
             but redefine them.
           </p>
 
-          {/* CTA Buttons - Fixed accessibility issues */}
+          {/* CTA Buttons */}
           <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               href="/contact"
               variant="primary"
               size={isMobile ? 'md' : 'lg'}
-              className="cta-button min-h-[44px] min-w-[44px]"
+              className="cta-button"
               icon={<ArrowUpRight className="h-4 w-4" />}
             >
               Start Your Project
@@ -191,7 +119,7 @@ const HeroSection = () => {
               href="/portfolio"
               variant="outline"
               size={isMobile ? 'md' : 'lg'}
-              className="cta-button min-h-[44px] min-w-[44px]"
+              className="cta-button"
               icon={<ArrowUpRight className="h-4 w-4" />}
             >
               Explore Our Work
@@ -200,19 +128,21 @@ const HeroSection = () => {
 
           {/* Features Grid */}
           <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="feature-card group relative rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:shadow-lg"
-              >
-                <div className="mb-4 inline-flex rounded-lg bg-accent/10 p-3 text-accent transition-colors group-hover:bg-accent/20">
-                  <feature.icon className="h-6 w-6" aria-hidden="true" />
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={feature.title}
+                  className="feature-card group relative rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:shadow-lg"
+                >
+                  <div className="mb-4 inline-flex rounded-lg bg-accent/10 p-3 text-accent transition-colors group-hover:bg-accent/20">
+                    <Icon className="h-6 w-6" aria-hidden="true" />
+                  </div>
+                  <h2 className="mb-2 text-lg font-semibold">{feature.title}</h2>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </div>
-                {/* Change to h2 since these are major sections under h1 */}
-                <h2 className="mb-2 text-lg font-semibold">{feature.title}</h2>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

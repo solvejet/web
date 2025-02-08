@@ -76,7 +76,6 @@ export async function validateCsrfToken(req: NextRequest): Promise<NextResponse 
 
   return null;
 }
-
 // API Security Middleware
 export async function apiSecurityMiddleware(request: NextRequest) {
   // Only apply to API routes

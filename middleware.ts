@@ -1,11 +1,16 @@
 // src/middleware.ts
 import { NextResponse, NextRequest } from 'next/server';
+import { csrfMiddleware } from '@/middleware/csrf';
 import { apiSecurityMiddleware } from '@/middleware/security';
 
-// Main middleware function
 export async function middleware(request: NextRequest) {
-  // Handle API routes with security middleware
+  // Apply CSRF middleware first
   if (request.url.includes('/api/')) {
+    const csrfResult = await csrfMiddleware(request);
+    if (csrfResult.status === 403) {
+      return csrfResult;
+    }
+    // Then apply API security middleware
     return apiSecurityMiddleware(request);
   }
 
@@ -13,7 +18,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const headers = new Headers(response.headers);
 
-  // Security headers for all routes
+  // Security headers
   headers.set('X-Frame-Options', 'DENY');
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -21,7 +26,7 @@ export async function middleware(request: NextRequest) {
   headers.set('X-XSS-Protection', '1; mode=block');
   headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 
-  // Content Security Policy for non-API routes
+  // CSP for non-API routes
   headers.set(
     'Content-Security-Policy',
     [
@@ -46,18 +51,6 @@ export async function middleware(request: NextRequest) {
   });
 }
 
-// Configure middleware matching
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
-    // Include API routes
-    '/api/:path*',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|public/).*)', '/api/:path*'],
 };

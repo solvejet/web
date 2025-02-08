@@ -1,5 +1,6 @@
 // src/utils/analytics-queue.ts
 import { getSessionId } from './analytics';
+import { fetchWithCsrf } from './api';
 
 type EventType = 'pageview' | 'performance' | 'utm' | 'campaign';
 
@@ -7,6 +8,7 @@ interface AnalyticsPayload {
   type: EventType;
   payload: Record<string, unknown>;
 }
+
 interface QueuedEvent {
   url: string;
   data: AnalyticsPayload;
@@ -29,13 +31,10 @@ class AnalyticsQueue {
       const event = this.queue[0];
       if (!event) return;
 
-      const response = await fetch(event.url, {
+      // Use fetchWithCsrf instead of regular fetch
+      const response = await fetchWithCsrf(event.url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(event.data),
-        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -48,6 +47,14 @@ class AnalyticsQueue {
             event.retries++;
             // Move to the end of the queue
             this.queue.push({ ...event });
+          }
+        } else if (response.status === 403) {
+          // CSRF error - retry with fresh token
+          if (event.retries < this.maxRetries) {
+            event.retries++;
+            setTimeout(() => {
+              this.queue.push({ ...event });
+            }, this.retryDelay * event.retries);
           }
         } else if (response.status >= 500) {
           // Server error - retry
@@ -94,7 +101,7 @@ class AnalyticsQueue {
 
 export const analyticsQueue = new AnalyticsQueue();
 
-// Updated trackPageView function
+// Updated trackPageView function using fetchWithCsrf
 export async function trackPageView(pathname: string, utmId?: string): Promise<void> {
   analyticsQueue.enqueue('/api/analytics', {
     type: 'pageview',

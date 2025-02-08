@@ -26,9 +26,11 @@ async function initializeCsrf(): Promise<void> {
       initializationAttempts++;
 
       const response = await fetch('/api/csrf', {
+        method: 'GET',
         credentials: 'include',
         headers: {
           Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
       });
 
@@ -36,20 +38,14 @@ async function initializeCsrf(): Promise<void> {
         throw new Error('Failed to fetch CSRF token');
       }
 
-      // Wait for cookies to be set
-      await new Promise((r) => setTimeout(r, 100));
-
-      const tokenCookie = document.cookie.split('; ').find((row) => row.startsWith('csrf-token='));
-
-      if (!tokenCookie) {
-        if (initializationAttempts < MAX_ATTEMPTS) {
-          csrfInitializationPromise = null;
-          await new Promise((r) => setTimeout(r, RETRY_DELAY));
-          resolve(initializeCsrf());
-          return;
-        }
-        throw new Error('CSRF token not set in cookies');
+      // Get the token from the response header
+      const csrfToken = response.headers.get('X-CSRF-Token');
+      if (!csrfToken) {
+        throw new Error('No CSRF token in response');
       }
+
+      // Store the token in a cookie
+      document.cookie = `csrf-token=${csrfToken}; path=/; samesite=lax`;
 
       csrfInitialized = true;
       resolve();

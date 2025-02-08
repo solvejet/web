@@ -1,19 +1,16 @@
 // src/app/api/analytics/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { connectToDatabase } from '@/lib/mongodb';
-import { UTM, PageView, CampaignPerformance } from '@/models/analytics';
+import { UTM, PageView, CampaignPerformance, Performance } from '@/models/analytics';
 import { getClientInfo } from '@/utils/analytics';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateCsrfToken } from '@/middleware/security';
 import { z } from 'zod';
 
-// Validation schemas
-const baseSchema = z.object({
-  type: z.enum(['utm', 'pageview', 'campaign']),
-  payload: z.object({}).passthrough(),
-});
-
+// Validation schemas for better type safety and validation
 const utmSchema = z.object({
+  type: z.literal('utm'),
   payload: z.object({
     utm_source: z.string().nullable(),
     utm_medium: z.string().nullable(),
@@ -27,6 +24,7 @@ const utmSchema = z.object({
 });
 
 const pageViewSchema = z.object({
+  type: z.literal('pageview'),
   payload: z.object({
     pathname: z.string(),
     sessionId: z.string(),
@@ -35,134 +33,241 @@ const pageViewSchema = z.object({
 });
 
 const campaignSchema = z.object({
+  type: z.literal('campaign'),
   payload: z.object({
     campaignId: z.string(),
     adId: z.string().optional(),
     adGroupId: z.string().optional(),
     platform: z.enum(['linkedin', 'other']),
     metrics: z.object({
-      impressions: z.number(),
-      clicks: z.number(),
-      conversions: z.number(),
-      spend: z.number(),
+      impressions: z.number().int().nonnegative(),
+      clicks: z.number().int().nonnegative(),
+      conversions: z.number().int().nonnegative(),
+      spend: z.number().nonnegative(),
     }),
     targetAudience: z.string().optional(),
     region: z.string().optional(),
   }),
 });
 
+// Combined schema for initial validation
+
+const performanceSchema = z.object({
+  type: z.literal('performance'),
+  payload: z.object({
+    metric: z.string().optional(),
+    value: z.number(),
+    rating: z.enum(['good', 'needs-improvement', 'poor']),
+    pathname: z.string(),
+    timestamp: z.string(),
+  }),
+});
+
+const analyticsSchema = z.discriminatedUnion('type', [
+  utmSchema,
+  pageViewSchema,
+  campaignSchema,
+  performanceSchema,
+]);
+
+// Type guard for checking if error is a ZodError
+function isZodError(error: unknown): error is z.ZodError {
+  return error instanceof z.ZodError;
+}
+
+interface ErrorResponse {
+  error: string;
+  details?: Record<string, unknown>;
+}
+
+// Error response helper
+function createErrorResponse(
+  message: string,
+  status: number = 400,
+  details?: Record<string, unknown>
+) {
+  const errorBody: ErrorResponse = { error: message };
+  if (details) {
+    errorBody['details'] = details;
+  }
+
+  return NextResponse.json(errorBody, { status });
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // 1. Rate limiting
-    const limiter = await rateLimit(req);
-    if (!limiter.success) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    // 1. Early read of request body
+    let body: unknown;
+    try {
+      body = await req.json();
+      console.log('Received analytics request:', body);
+    } catch {
+      return createErrorResponse('Invalid JSON payload', 400);
     }
 
-    // 2. CSRF validation
+    // 2. Origin validation
+    const origin = req.headers.get('origin');
+    const allowedOrigin = process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000';
+
+    if (origin && origin !== allowedOrigin) {
+      return createErrorResponse('Invalid origin', 403);
+    }
+
+    // 3. Rate limiting
+    const limiter = await rateLimit(req, 'analytics');
+    if (!limiter.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many requests',
+          retryAfter: Math.ceil((limiter.reset - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil((limiter.reset - Date.now()) / 1000).toString(),
+          },
+        }
+      );
+    }
+
+    // 4. CSRF validation
     const csrfError = await validateCsrfToken(req);
     if (csrfError) {
       return csrfError;
     }
 
-    // 3. Origin validation
-    const origin = req.headers.get('origin');
-    const allowedOrigins = [process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'];
-
-    if (origin && !allowedOrigins.includes(origin)) {
-      return NextResponse.json({ error: 'Invalid origin' }, { status: 403 });
-    }
-
-    // 4. Basic data validation
-    const data = await req.json();
-    const baseValidation = baseSchema.safeParse(data);
-
-    if (!baseValidation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request format', details: baseValidation.error },
-        { status: 400 }
+    // 5. Schema validation
+    const validationResult = analyticsSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.log('Validation failed:', validationResult.error.format());
+      return createErrorResponse(
+        'Invalid request format',
+        400,
+        validationResult.error.format() as Record<string, unknown>
       );
     }
 
-    const { type, payload } = baseValidation.data;
-    const clientInfo = await getClientInfo(req);
+    const data = validationResult.data;
+    const clientInfo = getClientInfo(req);
 
-    // 5. Database connection
+    // 6. Database connection
     await connectToDatabase();
 
-    // 6. Type-specific validation and processing
-    switch (type) {
-      case 'utm': {
-        const validation = utmSchema.safeParse(data);
-        if (!validation.success) {
-          return NextResponse.json(
-            { error: 'Invalid UTM data', details: validation.error },
-            { status: 400 }
-          );
-        }
+    // 7. Process by event type
+    let response: { id?: string; success?: boolean };
 
+    switch (data.type) {
+      case 'performance': {
+        const performance = new Performance({
+          metric: data.payload.metric,
+          value: data.payload.value,
+          rating: data.payload.rating,
+          pathname: data.payload.pathname,
+          timestamp: new Date(data.payload.timestamp),
+          ...clientInfo, // This spreads the IP, device info, etc.
+        });
+        await performance.save();
+        response = { success: true };
+        break;
+      }
+
+      case 'utm': {
         const utm = new UTM({
-          ...payload,
+          ...data.payload,
           ...clientInfo,
           timestamp: new Date(),
         });
         await utm.save();
-        return NextResponse.json({ id: utm._id });
+        response = { id: utm._id.toString() };
+        break;
       }
 
       case 'pageview': {
-        const validation = pageViewSchema.safeParse(data);
-        if (!validation.success) {
-          return NextResponse.json(
-            { error: 'Invalid pageview data', details: validation.error },
-            { status: 400 }
-          );
-        }
-
         const pageView = new PageView({
-          ...payload,
+          ...data.payload,
           ...clientInfo,
           timestamp: new Date(),
         });
         await pageView.save();
-        return NextResponse.json({ success: true });
+        response = { success: true };
+        break;
       }
 
       case 'campaign': {
-        const validation = campaignSchema.safeParse(data);
-        if (!validation.success) {
-          return NextResponse.json(
-            { error: 'Invalid campaign data', details: validation.error },
-            { status: 400 }
-          );
-        }
-
         const campaign = new CampaignPerformance({
-          ...payload,
+          ...data.payload,
           date: new Date(),
         });
         await campaign.save();
-        return NextResponse.json({ success: true });
+        response = { success: true };
+        break;
       }
-
-      default:
-        return NextResponse.json({ error: 'Invalid event type' }, { status: 400 });
     }
+
+    // 8. Return success response with CORS headers
+    return NextResponse.json(response, {
+      headers: {
+        'Access-Control-Allow-Origin': origin && origin === allowedOrigin ? origin : allowedOrigin,
+        'Access-Control-Allow-Credentials': 'true',
+      },
+    });
   } catch (error) {
     console.error('Analytics API Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+
+    // Handle different types of errors
+    if (isZodError(error)) {
+      return createErrorResponse(
+        'Validation error',
+        400,
+        error.format() as Record<string, unknown>
+      );
+    }
+
+    if (error instanceof mongoose.Error.ValidationError) {
+      return createErrorResponse('Database validation error', 400);
+    }
+
+    if (error instanceof mongoose.Error.CastError) {
+      return createErrorResponse('Invalid data format', 400);
+    }
+
+    // Generic error response
+    return createErrorResponse('Internal Server Error', 500);
   }
 }
 
-// Only allow POST requests
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const allowedOrigin = process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000';
+
+  return NextResponse.json(
+    {},
+    {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': origin && origin === allowedOrigin ? origin : allowedOrigin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400', // 24 hours
+      },
+    }
+  );
+}
+
+// Prevent other HTTP methods
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return createErrorResponse('Method not allowed', 405);
 }
 
 export async function PUT() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return createErrorResponse('Method not allowed', 405);
 }
 
 export async function DELETE() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return createErrorResponse('Method not allowed', 405);
+}
+
+export async function PATCH() {
+  return createErrorResponse('Method not allowed', 405);
 }

@@ -93,10 +93,42 @@ const CampaignPerformanceSchema = new Schema<ICampaignPerformance>({
   region: String,
 });
 
+export interface IPerformance extends Document {
+  metric: string;
+  value: number;
+  rating: 'good' | 'needs-improvement' | 'poor';
+  pathname: string;
+  timestamp: Date;
+  ip: string;
+  deviceType: string;
+  browser: string;
+  os: string;
+  country?: string;
+  region?: string;
+  city?: string;
+}
+
+const PerformanceSchema = new Schema<IPerformance>({
+  metric: { type: String, required: false, index: true },
+  value: { type: Number, required: true },
+  rating: { type: String, required: true, enum: ['good', 'needs-improvement', 'poor'] },
+  pathname: { type: String, required: true, index: true },
+  timestamp: { type: Date, default: Date.now, index: true },
+  ip: { type: String, required: true },
+  deviceType: { type: String, required: true },
+  browser: { type: String, required: true },
+  os: { type: String, required: true },
+  country: String,
+  region: String,
+  city: String,
+});
+
 // Create indexes for common queries
 UTMSchema.index({ timestamp: 1, utm_source: 1, utm_campaign: 1 });
 PageViewSchema.index({ timestamp: 1, pathname: 1 });
 CampaignPerformanceSchema.index({ date: 1, platform: 1 });
+PerformanceSchema.index({ timestamp: 1, metric: 1 });
+PerformanceSchema.index({ timestamp: 1, pathname: 1 });
 
 // Create models if they don't exist
 export const UTM = mongoose.models['UTM'] || mongoose.model<IUTM>('UTM', UTMSchema);
@@ -105,3 +137,5 @@ export const PageView =
 export const CampaignPerformance =
   mongoose.models['CampaignPerformance'] ||
   mongoose.model<ICampaignPerformance>('CampaignPerformance', CampaignPerformanceSchema);
+export const Performance =
+  mongoose.models['Performance'] || mongoose.model<IPerformance>('Performance', PerformanceSchema);
