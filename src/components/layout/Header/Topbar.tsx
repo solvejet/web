@@ -41,7 +41,7 @@ const Topbar = () => {
 
           {/* Theme Toggle - Both Mobile and Desktop */}
           <div className="flex items-center pl-4">
-            <ThemeToggle size="sm" />
+            <ThemeToggle aria-label="Toggle theme" />
           </div>
         </div>
       </div>

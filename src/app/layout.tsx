@@ -145,12 +145,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${poppins.variable} min-h-dvh bg-background font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          storageKey="solvejet-theme"
-        >
+        <ThemeProvider defaultTheme="system" storageKey="solvejet-theme">
           <div className="relative flex min-h-dvh flex-col">
             <Header />
             <main className="flex-1 pt-[105px]">{children}</main>
