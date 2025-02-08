@@ -16,6 +16,12 @@ const WhatWeDoSectionLoading = () => (
   </div>
 );
 
+const FeaturedProjectsLoading = () => (
+  <div className="animate-pulse">
+    <div className="h-[400px] bg-accent/5" />
+  </div>
+);
+
 // Dynamic imports
 const HeroSection = dynamic(() => import('@/components/Home/HeroSection'), {
   ssr: true,
@@ -25,6 +31,11 @@ const HeroSection = dynamic(() => import('@/components/Home/HeroSection'), {
 const WhatWeDoSection = dynamic(() => import('@/components/Home/WhatWeDoSection'), {
   ssr: true,
   loading: () => <WhatWeDoSectionLoading />,
+});
+
+const FeaturedProjects = dynamic(() => import('@/components/Home/FeaturedProjects'), {
+  ssr: true,
+  loading: () => <FeaturedProjectsLoading />,
 });
 
 export const metadata: Metadata = {
@@ -71,6 +82,10 @@ export default function HomePage() {
 
       <Suspense fallback={<WhatWeDoSectionLoading />}>
         <WhatWeDoSection />
+      </Suspense>
+
+      <Suspense fallback={<FeaturedProjectsLoading />}>
+        <FeaturedProjects />
       </Suspense>
       {/* Add other sections here as needed */}
     </>
