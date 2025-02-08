@@ -1,4 +1,6 @@
 // src/hooks/use-memo.ts
+'use client';
+
 import { useMemo, useCallback, type DependencyList, useRef, useEffect, useState } from 'react';
 
 interface MemoOptions {

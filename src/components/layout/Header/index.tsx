@@ -86,9 +86,6 @@ export default function Header() {
           </div>
         </div>
       </header>
-
-      {/* Add spacer for fixed header */}
-      <div className="h-[105px]" aria-hidden="true" />
     </>
   );
 }

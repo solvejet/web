@@ -82,10 +82,17 @@ const config: Config = {
           '0%': { transform: 'translateY(100%)' },
           '100%': { transform: 'translateY(0)' },
         },
-        // Added new animation for smooth transitions
         'scale-in': {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'pulse-slow': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '0.8' },
         },
       },
       animation: {

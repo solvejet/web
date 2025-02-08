@@ -67,10 +67,12 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
       () =>
         cn(
           'rounded-full flex items-center justify-center',
-          'text-foreground hover:bg-muted',
-          'focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2',
+          'text-foreground hover:bg-accent/10',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          'transition-all duration-200',
+          'transition-all duration-300 ease-in-out',
+          'hover:shadow-lg hover:scale-105 active:scale-95',
+          'bg-background',
           sizeStyles[size],
           className
         ),
@@ -78,10 +80,9 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
       { maxSize: 20 }
     );
 
-    // Handle click with performance tracking
     const handleToggle = React.useCallback(() => {
       const cleanup = measureUserInteraction('theme-toggle');
-      setTheme(theme === 'dark' ? 'light' : 'dark');
+      setTheme(theme === 'light' ? 'dark' : 'light');
       cleanup();
     }, [theme, setTheme, measureUserInteraction]);
 
@@ -90,13 +91,19 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
       () => ({
         sun: cn(
           'w-5 h-5 stroke-current absolute',
-          'transition-all duration-500',
-          theme === 'dark' ? 'scale-0 opacity-0 rotate-90' : 'scale-100 opacity-100 rotate-0'
+          'transition-all duration-500 ease-spring',
+          'stroke-2',
+          theme === 'light'
+            ? 'scale-100 opacity-100 rotate-0 transform-gpu'
+            : 'scale-0 opacity-0 rotate-90 transform-gpu'
         ),
         moon: cn(
           'w-5 h-5 stroke-current absolute',
-          'transition-all duration-500',
-          theme === 'dark' ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 rotate-90'
+          'transition-all duration-500 ease-spring',
+          'stroke-2',
+          theme === 'light'
+            ? 'scale-0 opacity-0 rotate-90 transform-gpu'
+            : 'scale-100 opacity-100 rotate-0 transform-gpu'
         ),
       }),
       [theme],
@@ -148,14 +155,13 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
 
-        {/* Focus ring animation */}
+        {/* Hover/Active state glow effect */}
         <div
           className={cn(
             'absolute inset-0 pointer-events-none rounded-full',
-            'ring-2 ring-accent/50 ring-offset-2',
-            'opacity-0 scale-105',
-            'focus-within:opacity-100 focus-within:scale-100',
-            'transition-all duration-200',
+            'bg-accent/5 opacity-0 scale-110',
+            'group-hover:opacity-100 group-hover:scale-105',
+            'transition-all duration-300 ease-in-out',
             props.disabled && 'hidden'
           )}
           aria-hidden="true"
