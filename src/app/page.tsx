@@ -1,16 +1,30 @@
 // src/app/page.tsx
-import WhatWeDoSection from '@/components/Home/WhatWeDoSection';
-import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import type { Metadata } from 'next';
 
-// Dynamic import for the hero section with loading fallback
+// Loading components
+const HeroSectionLoading = () => (
+  <div className="animate-pulse">
+    <div className="h-[600px] bg-accent/5" />
+  </div>
+);
+
+const WhatWeDoSectionLoading = () => (
+  <div className="animate-pulse">
+    <div className="h-[400px] bg-accent/5" />
+  </div>
+);
+
+// Dynamic imports
 const HeroSection = dynamic(() => import('@/components/Home/HeroSection'), {
   ssr: true,
-  loading: () => (
-    <div className="animate-pulse">
-      <div className="h-[600px] bg-accent/5" />
-    </div>
-  ),
+  loading: () => <HeroSectionLoading />,
+});
+
+const WhatWeDoSection = dynamic(() => import('@/components/Home/WhatWeDoSection'), {
+  ssr: true,
+  loading: () => <WhatWeDoSectionLoading />,
 });
 
 export const metadata: Metadata = {
@@ -51,8 +65,13 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <WhatWeDoSection />
+      <Suspense fallback={<HeroSectionLoading />}>
+        <HeroSection />
+      </Suspense>
+
+      <Suspense fallback={<WhatWeDoSectionLoading />}>
+        <WhatWeDoSection />
+      </Suspense>
       {/* Add other sections here as needed */}
     </>
   );

@@ -6,7 +6,6 @@ import { gsap } from 'gsap';
 import useMediaQuery from '@/hooks/useMediaQuery';
 import { ArrowUpRight, Code, Rocket, Shield, Users } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 // Feature data for better code organization and maintainability
@@ -62,24 +61,20 @@ const HeroSection = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
-    // Only run animations if the section is mounted and visible
     if (!sectionRef.current || typeof window === 'undefined') return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: {
           ease: ANIMATION_SETTINGS.defaultEase,
-          clearProps: 'transform,opacity', // Only clear necessary properties
+          clearProps: 'transform,opacity',
         },
       });
 
-      // Optimized animation sequence
+      // Animation sequence remains the same
       tl.fromTo(
         '.gradient-orb',
-        {
-          scale: 0.9,
-          opacity: 0,
-        },
+        { scale: 0.9, opacity: 0 },
         {
           scale: 1,
           opacity: 1,
@@ -89,10 +84,7 @@ const HeroSection = () => {
       )
         .fromTo(
           '.hero-title .word',
-          {
-            y: 20,
-            opacity: 0,
-          },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
@@ -103,10 +95,7 @@ const HeroSection = () => {
         )
         .fromTo(
           '.hero-description',
-          {
-            y: 20,
-            opacity: 0,
-          },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
@@ -116,10 +105,7 @@ const HeroSection = () => {
         )
         .fromTo(
           '.cta-button',
-          {
-            y: 10,
-            opacity: 0,
-          },
+          { y: 10, opacity: 0 },
           {
             y: 0,
             opacity: 1,
@@ -130,10 +116,7 @@ const HeroSection = () => {
         )
         .fromTo(
           '.feature-card',
-          {
-            y: 20,
-            opacity: 0,
-          },
+          { y: 20, opacity: 0 },
           {
             y: 0,
             opacity: 1,
@@ -153,14 +136,14 @@ const HeroSection = () => {
       className="relative min-h-[85vh] overflow-hidden px-4 pt-16"
       aria-label="Hero section"
     >
-      {/* Background Elements - Reduced blur for better performance */}
+      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="gradient-orb absolute -left-20 top-20 h-72 w-72 rounded-full bg-gradient-to-r from-[#FF8BAE]/20 to-[#C400FF]/20 blur-2xl" />
         <div className="gradient-orb absolute right-10 top-40 h-64 w-64 rounded-full bg-gradient-to-r from-[#00E1FF]/20 to-[#0047FF]/20 blur-2xl" />
         <div className="gradient-orb absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-gradient-to-r from-[#FFB800]/20 to-[#FF5C00]/20 blur-2xl" />
       </div>
 
-      {/* Grid Pattern Overlay - Using CSS mask for better performance */}
+      {/* Grid Pattern Overlay */}
       <div
         className="absolute inset-0 opacity-[0.15] pointer-events-none"
         style={{
@@ -175,7 +158,6 @@ const HeroSection = () => {
       {/* Main Content */}
       <div className="relative mx-auto max-w-6xl">
         <div className="hero-content text-center">
-          {/* Semantic heading structure */}
           <h1 className="hero-title text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             {['Crafting', 'Digital', 'Excellence', 'with'].map((word, i) => (
               <span key={i} className="word mx-1 inline-block">
@@ -193,24 +175,26 @@ const HeroSection = () => {
             but redefine them.
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Fixed accessibility issues */}
           <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
+              href="/contact"
               variant="primary"
               size={isMobile ? 'md' : 'lg'}
-              className="cta-button"
+              className="cta-button min-h-[44px] min-w-[44px]"
               icon={<ArrowUpRight className="h-4 w-4" />}
             >
-              <Link href="/contact">Start Your Project</Link>
+              Start Your Project
             </Button>
 
             <Button
+              href="/portfolio"
               variant="outline"
               size={isMobile ? 'md' : 'lg'}
-              className="cta-button flex items-center gap-2"
+              className="cta-button min-h-[44px] min-w-[44px]"
               icon={<ArrowUpRight className="h-4 w-4" />}
             >
-              <Link href="/portfolio">Explore Our Work</Link>
+              Explore Our Work
             </Button>
           </div>
 
@@ -222,9 +206,10 @@ const HeroSection = () => {
                 className="feature-card group relative rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:shadow-lg"
               >
                 <div className="mb-4 inline-flex rounded-lg bg-accent/10 p-3 text-accent transition-colors group-hover:bg-accent/20">
-                  <feature.icon className="h-6 w-6" />
+                  <feature.icon className="h-6 w-6" aria-hidden="true" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
+                {/* Change to h2 since these are major sections under h1 */}
+                <h2 className="mb-2 text-lg font-semibold">{feature.title}</h2>
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
               </div>
             ))}

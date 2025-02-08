@@ -9,17 +9,9 @@ import WhatWeDo from './MegaMenu/WhatWeDo';
 import Industries from './MegaMenu/Industries';
 import Technologies from './MegaMenu/Technologies';
 import Company from './MegaMenu/Company';
+import SkipToContent from '../SkipToContent';
 
 export type MenuId = 'what-we-do' | 'industries' | 'technologies' | 'company' | 'case-studies';
-
-const SkipToContent = () => (
-  <a
-    href="#main-content"
-    className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:outline-none focus:ring-2 focus:ring-accent rounded-md"
-  >
-    Skip to main content
-  </a>
-);
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
