@@ -1,168 +1,133 @@
 // src/components/Home/WhatWeDoSection/index.tsx
 'use client';
-
-import { useRef } from 'react';
-import { cn } from '@/lib/utils';
+import React, { useRef } from 'react';
 import Link from 'next/link';
-import { Code, Cloud, Brain, Globe, Smartphone, Blocks } from 'lucide-react';
-
-// Define our services directly to ensure data availability
-const services = [
-  {
-    title: 'Custom Software Development',
-    description: 'Tailored solutions built to address your unique business challenges',
-    icon: Code,
-    href: '/services/custom-software',
-  },
-  {
-    title: 'Web Development',
-    description: 'Modern web applications built with cutting-edge technologies',
-    icon: Globe,
-    href: '/services/web-development',
-  },
-  {
-    title: 'AI/ML Solutions',
-    description: 'Intelligent solutions powered by advanced AI and machine learning',
-    icon: Brain,
-    href: '/services/ai-ml',
-  },
-  {
-    title: 'Cloud Services',
-    description: 'Scalable cloud solutions for modern business needs',
-    icon: Cloud,
-    href: '/services/cloud',
-  },
-  {
-    title: 'Mobile App Development',
-    description: 'Native and cross-platform mobile applications',
-    icon: Smartphone,
-    href: '/services/mobile',
-  },
-  {
-    title: 'Blockchain Development',
-    description: 'Secure and innovative blockchain solutions',
-    icon: Blocks,
-    href: '/services/blockchain',
-  },
-];
-
-interface ServiceCardProps {
-  title: string;
-  description: string;
-  icon: typeof Code;
-  href: string;
-}
-
-const ServiceCard = ({ title, description, icon: Icon, href }: ServiceCardProps) => {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        'service-card group relative block overflow-hidden',
-        'rounded-lg border border-border/40 bg-background/50',
-        'transition duration-300 ease-out',
-        'hover:border-accent/20 hover:bg-accent/[0.02] hover:shadow-lg'
-      )}
-    >
-      <div className="p-6">
-        {/* Icon */}
-        <div
-          className={cn(
-            'mb-4 inline-flex rounded-lg p-3',
-            'bg-accent/5',
-            'transition-transform duration-300 ease-out',
-            'group-hover:scale-105'
-          )}
-        >
-          <Icon className="h-6 w-6" />
-        </div>
-
-        {/* Content */}
-        <div className="transition-transform duration-300 ease-out group-hover:translate-y-[-2px]">
-          <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-          <p className="text-muted-foreground">{description}</p>
-        </div>
-
-        {/* Learn More */}
-        <div
-          className={cn(
-            'mt-4 flex items-center gap-2 text-sm font-medium',
-            'transform opacity-0 transition duration-300 ease-out',
-            'group-hover:translate-x-0 group-hover:opacity-100'
-          )}
-        >
-          Learn more
-          <svg
-            className={cn(
-              'h-4 w-4 transform transition-transform duration-300',
-              'group-hover:translate-x-1'
-            )}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 8l4 4m0 0l-4 4m4-4H3"
-            />
-          </svg>
-        </div>
-      </div>
-    </Link>
-  );
-};
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { whatWeDoItems } from '@/config/menu-data';
+import { cn } from '@/lib/utils';
+import Button from '@/components/ui/Button';
 
 const WhatWeDoSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: scrollContainerRef,
+    offset: ['start end', 'end end'],
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
+  const y = useTransform(scrollYProgress, [0, 0.2], [50, 0]);
 
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-gradient-to-b from-background to-accent/[0.02] px-4 py-24 lg:py-32"
+      className="relative bg-background py-24 lg:py-32"
       aria-labelledby="what-we-do-title"
     >
-      {/* Background Accent */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0)`,
-          backgroundSize: '48px 48px',
-        }}
-        aria-hidden="true"
-      />
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+          {/* Left Sticky Content */}
+          <div className="lg:sticky lg:top-32 lg:h-fit">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="max-w-xl"
+            >
+              <h2 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+                Transforming Ideas into{' '}
+                <span className="bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+                  Digital Reality
+                </span>
+              </h2>
+              <p className="mt-6 text-lg text-muted-foreground">
+                Our comprehensive suite of services combines innovation with expertise to create
+                solutions that drive your business forward. From concept to execution, we&apos;re
+                your partner in digital transformation.
+              </p>
+              <div className="mt-8 flex items-center gap-4">
+                <Button
+                  href="/portfolio"
+                  variant="outline"
+                  className="group"
+                  icon={
+                    <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                  }
+                >
+                  View Our Work
+                </Button>
+              </div>
+            </motion.div>
+          </div>
 
-      <div className="relative mx-auto max-w-7xl">
-        {/* Section Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h2
-            id="what-we-do-title"
-            className="section-heading mb-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
-          >
-            {['We', 'Transform', 'Ideas', 'Into', 'Reality'].map((word, i) => (
-              <span key={i} className="mx-1 inline-block">
-                {word}
-              </span>
-            ))}
-          </h2>
-          <p className="text-base text-muted-foreground sm:text-lg">
-            We combine innovation with expertise to create solutions that drive your business
-            forward. Our comprehensive suite of services ensures your success in the digital
-            landscape.
-          </p>
-        </div>
+          {/* Right Scrolling Content */}
+          <motion.div ref={scrollContainerRef} style={{ opacity, y }} className="space-y-8">
+            {whatWeDoItems.map((item, index) => {
+              const Icon = item.icon;
 
-        {/* Services Grid */}
-        <div
-          className={cn(
-            'services-grid mt-16',
-            'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'
-          )}
-        >
-          {services.map((service) => (
-            <ServiceCard key={service.title} {...service} />
-          ))}
+              return (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.1,
+                  }}
+                  className={cn(
+                    'group relative rounded-2xl border border-border/50',
+                    'overflow-hidden bg-background/50 p-8',
+                    'backdrop-blur-sm transition-all duration-300',
+                    'hover:border-accent/50 hover:bg-accent/[0.02]',
+                    'hover:shadow-lg hover:shadow-accent/5'
+                  )}
+                >
+                  {/* Service Content */}
+                  <div className="relative z-10 flex gap-6">
+                    <div
+                      className={cn(
+                        'flex h-12 w-12 shrink-0 items-center justify-center',
+                        'rounded-lg bg-accent/10 text-accent',
+                        'transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20'
+                      )}
+                    >
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold tracking-tight">{item.title}</h3>
+                      <p className="mt-2 text-muted-foreground">{item.description}</p>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          'mt-4 inline-flex items-center text-sm text-accent',
+                          'transition-colors duration-200 hover:text-accent/80',
+                          'focus-visible:outline-none focus-visible:ring-2',
+                          'focus-visible:ring-accent focus-visible:ring-offset-2'
+                        )}
+                      >
+                        <span className="font-medium">Learn more</span>
+                        <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Decorative gradient */}
+                  <div
+                    className={cn(
+                      'absolute inset-0 z-0 opacity-0',
+                      'bg-gradient-to-br from-accent/10 via-transparent to-transparent',
+                      'transition-opacity duration-300 group-hover:opacity-100'
+                    )}
+                    aria-hidden="true"
+                  />
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </div>
     </section>

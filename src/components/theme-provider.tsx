@@ -2,176 +2,31 @@
 'use client';
 
 import * as React from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useMemoWithCache } from '@/hooks/use-memo';
+import { Moon, Sun } from 'lucide-react';
 import { usePerformance } from '@/hooks/use-performance';
 import { cn } from '@/lib/utils';
 
 type Theme = 'dark' | 'light' | 'system';
 
-type ThemeProviderProps = {
+interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
   attribute?: string;
   enableSystem?: boolean;
-};
+}
 
-type ThemeProviderState = {
+interface ThemeProviderState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-};
+}
 
 const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
-
-const getThemeFromStorage = (key: string, fallback: Theme): Theme => {
-  if (typeof window === 'undefined') return fallback;
-
-  try {
-    const stored = localStorage.getItem(key);
-    return (stored as Theme) || fallback;
-  } catch (e) {
-    console.warn('Error reading from localStorage:', e);
-    return fallback;
-  }
-};
-
-// Theme Toggle Button Component
-interface ThemeToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  size?: 'sm' | 'md' | 'lg';
-}
-
-export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>(
-  ({ className, size = 'md', ...props }, ref) => {
-    const { theme, setTheme } = useTheme();
-    const { measureUserInteraction } = usePerformance();
-
-    // Cache size styles
-    const sizeStyles = useMemoWithCache(
-      () => ({
-        sm: 'h-8 w-8',
-        md: 'h-10 w-10',
-        lg: 'h-12 w-12',
-      }),
-      [],
-      { maxSize: 1 }
-    );
-
-    // Cache button styles
-    const buttonStyles = useMemoWithCache(
-      () =>
-        cn(
-          'rounded-full flex items-center justify-center',
-          'text-foreground hover:bg-accent/10',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          'transition-all duration-300 ease-in-out',
-          'hover:shadow-lg hover:scale-105 active:scale-95',
-          'bg-background',
-          sizeStyles[size],
-          className
-        ),
-      [size, className],
-      { maxSize: 20 }
-    );
-
-    const handleToggle = React.useCallback(() => {
-      const cleanup = measureUserInteraction('theme-toggle');
-      setTheme(theme === 'light' ? 'dark' : 'light');
-      cleanup();
-    }, [theme, setTheme, measureUserInteraction]);
-
-    // Cache icon styles
-    const iconStyles = useMemoWithCache(
-      () => ({
-        sun: cn(
-          'w-5 h-5 stroke-current absolute',
-          'transition-all duration-500 ease-spring',
-          'stroke-2',
-          theme === 'light'
-            ? 'scale-100 opacity-100 rotate-0 transform-gpu'
-            : 'scale-0 opacity-0 rotate-90 transform-gpu'
-        ),
-        moon: cn(
-          'w-5 h-5 stroke-current absolute',
-          'transition-all duration-500 ease-spring',
-          'stroke-2',
-          theme === 'light'
-            ? 'scale-0 opacity-0 rotate-90 transform-gpu'
-            : 'scale-100 opacity-100 rotate-0 transform-gpu'
-        ),
-      }),
-      [theme],
-      { maxSize: 2 }
-    );
-
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={buttonStyles}
-        onClick={handleToggle}
-        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-        {...props}
-      >
-        {/* Sun icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={iconStyles.sun}
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-
-        {/* Moon icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={iconStyles.moon}
-          aria-hidden="true"
-        >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-
-        {/* Hover/Active state glow effect */}
-        <div
-          className={cn(
-            'absolute inset-0 pointer-events-none rounded-full',
-            'bg-accent/5 opacity-0 scale-110',
-            'group-hover:opacity-100 group-hover:scale-105',
-            'transition-all duration-300 ease-in-out',
-            props.disabled && 'hidden'
-          )}
-          aria-hidden="true"
-        />
-      </button>
-    );
-  }
-);
-
-ThemeToggle.displayName = 'ThemeToggle';
+const ThemeProviderContext = React.createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -181,66 +36,95 @@ export function ThemeProvider({
   enableSystem = true,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => getThemeFromStorage(storageKey, defaultTheme));
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    const attributeValue =
-      theme === 'system' && enableSystem
-        ? window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light'
-        : theme;
-
-    if (attribute === 'class') {
-      root.classList.remove('light', 'dark');
-      root.classList.add(attributeValue);
-    } else {
-      root.setAttribute(attribute, attributeValue);
+  const [theme, setTheme] = React.useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
     }
-  }, [theme, attribute, enableSystem]);
+    return defaultTheme;
+  });
 
-  useEffect(() => {
+  const [mounted] = React.useState(false);
+
+  // Update theme in localStorage and document
+  const updateTheme = React.useCallback(
+    (newTheme: Theme) => {
+      const root = window.document.documentElement;
+
+      // Remove existing classes
+      root.classList.remove('light', 'dark');
+
+      // Apply new theme
+      if (newTheme === 'system') {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+
+        if (attribute === 'class') {
+          root.classList.add(systemTheme);
+        } else {
+          root.setAttribute(attribute, systemTheme);
+        }
+      } else {
+        if (attribute === 'class') {
+          root.classList.add(newTheme);
+        } else {
+          root.setAttribute(attribute, newTheme);
+        }
+      }
+    },
+    [attribute]
+  );
+
+  // Handle theme change
+  React.useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(storageKey, theme);
+      } catch (e) {
+        console.warn('Failed to save theme preference:', e);
+      }
+      updateTheme(theme);
+    }
+  }, [theme, storageKey, mounted, updateTheme]);
+
+  // Handle system theme changes
+  React.useEffect(() => {
     if (!enableSystem) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const handleChange = () => {
       if (theme === 'system') {
-        const root = window.document.documentElement;
-        const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-
-        if (attribute === 'class') {
-          root.classList.remove('light', 'dark');
-          root.classList.add(systemTheme);
-        } else {
-          root.setAttribute(attribute, systemTheme);
-        }
+        updateTheme('system');
       }
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme, attribute, enableSystem]);
+  }, [theme, updateTheme, enableSystem]);
+
+  // Handle initial mount
+  React.useEffect(() => {
+    if (!mounted) return;
+
+    if (!enableSystem && theme === 'system') {
+      // If system theme is disabled and current theme is system,
+      // fallback to light theme
+      setTheme('light');
+      return;
+    }
+
+    updateTheme(theme);
+  }, [theme, updateTheme, mounted, enableSystem]);
 
   const value = React.useMemo(
     () => ({
       theme,
       setTheme: (newTheme: Theme) => {
-        try {
-          localStorage.setItem(storageKey, newTheme);
-        } catch (e) {
-          console.warn('Error writing to localStorage:', e);
-        }
         setTheme(newTheme);
       },
     }),
-    [theme, storageKey]
+    [theme]
   );
 
   if (!mounted) {
@@ -255,9 +139,75 @@ export function ThemeProvider({
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-  if (context === undefined) {
+  const context = React.useContext(ThemeProviderContext);
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 };
+
+interface ThemeToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>(
+  ({ className, size = 'md', ...props }, ref) => {
+    const { theme, setTheme } = useTheme();
+    const { measureUserInteraction } = usePerformance();
+    const isDark = theme === 'dark';
+
+    const handleClick = React.useCallback(() => {
+      const cleanup = measureUserInteraction('theme-toggle');
+      setTheme(isDark ? 'light' : 'dark');
+      cleanup();
+    }, [isDark, setTheme, measureUserInteraction]);
+
+    const sizeClasses = React.useMemo(
+      () => ({
+        sm: 'h-8 w-8',
+        md: 'h-10 w-10',
+        lg: 'h-12 w-12',
+      }),
+      []
+    );
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={handleClick}
+        className={cn(
+          'relative inline-flex items-center justify-center rounded-full',
+          'text-foreground hover:bg-accent/10',
+          'focus-visible:outline-none focus-visible:ring-2',
+          'focus-visible:ring-accent focus-visible:ring-offset-2',
+          'disabled:pointer-events-none disabled:opacity-50',
+          'transition-colors duration-200',
+          sizeClasses[size],
+          className
+        )}
+        aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+        {...props}
+      >
+        <Sun
+          className={cn(
+            'absolute h-[60%] w-[60%]',
+            'transition-all duration-200',
+            isDark ? 'scale-0 opacity-0' : 'scale-100 opacity-100',
+            'rotate-0 hover:rotate-90'
+          )}
+        />
+        <Moon
+          className={cn(
+            'absolute h-[60%] w-[60%]',
+            'transition-all duration-200',
+            isDark ? 'scale-100 opacity-100' : 'scale-0 opacity-0',
+            'rotate-0 hover:rotate-90'
+          )}
+        />
+      </button>
+    );
+  }
+);
+
+ThemeToggle.displayName = 'ThemeToggle';
