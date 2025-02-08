@@ -216,7 +216,7 @@ const HeroSection = () => {
 
           {/* Features Grid */}
           <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature, index) => (
+            {features.map((feature => (
               <div
                 key={feature.title}
                 className="feature-card group relative rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:shadow-lg"
