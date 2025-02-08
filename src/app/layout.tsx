@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import '@/app/globals.css';
 import Header from '@/components/layout/Header';
 import type { PropsWithChildren } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${poppins.variable} min-h-dvh bg-background font-sans antialiased`}>
+        <SpeedInsights />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
