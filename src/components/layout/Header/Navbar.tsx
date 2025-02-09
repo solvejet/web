@@ -111,7 +111,7 @@ export default function Navbar({ openMenu, onMenuOpenAction, onMouseLeaveAction 
                   className="focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
                   aria-label="SolveJet - Return to homepage"
                 >
-                  <Logo preserveColor className="h-12 w-auto" />
+                  <Logo className="h-12 w-auto" />
                 </Link>
               </div>
 
