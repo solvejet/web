@@ -2,43 +2,42 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
+import {
+  HeroSectionLoading,
+  WhatWeDoSectionLoading,
+  FeaturedProjectsLoading,
+  IndustriesSectionLoading,
+  AchievementsSectionLoading,
+  TechnologiesSectionLoading,
+} from '@/components/loading/section-loading';
 
-// Loading components
-const HeroSectionLoading = () => (
-  <div className="animate-pulse">
-    <div className="h-[600px] bg-accent/5" />
-  </div>
-);
-
-const WhatWeDoSectionLoading = () => (
-  <div className="animate-pulse">
-    <div className="h-[400px] bg-accent/5" />
-  </div>
-);
-
-const FeaturedProjectsLoading = () => (
-  <div className="animate-pulse">
-    <div className="h-[400px] bg-accent/5" />
-  </div>
-);
-
-// Dynamic imports
-const HeroSection = dynamic(() => import('@/components/Home/HeroSection'), {
-  ssr: true,
+// Dynamic imports with proper loading states
+const HeroSection = dynamic(() => import('@/components/Home/HeroSection/index'), {
   loading: () => <HeroSectionLoading />,
 });
 
-const WhatWeDoSection = dynamic(() => import('@/components/Home/WhatWeDoSection'), {
-  ssr: true,
+const WhatWeDoSection = dynamic(() => import('@/components/Home/WhatWeDoSection/index'), {
   loading: () => <WhatWeDoSectionLoading />,
 });
 
-const FeaturedProjects = dynamic(() => import('@/components/Home/FeaturedProjects'), {
-  ssr: true,
+const FeaturedProjects = dynamic(() => import('@/components/Home/FeaturedProjects/index'), {
   loading: () => <FeaturedProjectsLoading />,
 });
 
+const IndustriesSection = dynamic(() => import('@/components/Home/IndustriesSection/index'), {
+  loading: () => <IndustriesSectionLoading />,
+});
+
+const AchievementsSection = dynamic(() => import('@/components/Home/AchievementsSection/index'), {
+  loading: () => <AchievementsSectionLoading />,
+});
+
+const TechnologiesSection = dynamic(() => import('@/components/Home/TechnologiesSection/index'), {
+  loading: () => <TechnologiesSectionLoading />,
+});
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'),
   title: 'SolveJet - Product-driven Software Development Company',
   description:
     'Transform your business with our innovative software solutions. We specialize in custom software development, digital transformation, and product development.',
@@ -51,16 +50,20 @@ export const metadata: Metadata = {
     'mobile development',
   ],
   openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
     title: 'SolveJet - Product-driven Software Development Company',
     description:
       'Transform your business with our innovative software solutions. We specialize in custom software development, digital transformation, and product development.',
-    type: 'website',
+    siteName: 'SolveJet',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'SolveJet - Product-driven Software Development Company',
+        type: 'image/png',
       },
     ],
   },
@@ -69,13 +72,31 @@ export const metadata: Metadata = {
     title: 'SolveJet - Product-driven Software Development Company',
     description:
       'Transform your business with our innovative software solutions. We specialize in custom software development, digital transformation, and product development.',
-    images: ['/twitter-image.png'],
+    images: [
+      {
+        url: '/twitter-image.png',
+        alt: 'SolveJet - Product-driven Software Development',
+      },
+    ],
+    creator: '@solvejet',
+    site: '@solvejet',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
 export default function HomePage() {
   return (
-    <>
+    <main className="flex flex-col">
       <Suspense fallback={<HeroSectionLoading />}>
         <HeroSection />
       </Suspense>
@@ -87,7 +108,18 @@ export default function HomePage() {
       <Suspense fallback={<FeaturedProjectsLoading />}>
         <FeaturedProjects />
       </Suspense>
-      {/* Add other sections here as needed */}
-    </>
+
+      <Suspense fallback={<IndustriesSectionLoading />}>
+        <IndustriesSection />
+      </Suspense>
+
+      <Suspense fallback={<AchievementsSectionLoading />}>
+        <AchievementsSection />
+      </Suspense>
+
+      <Suspense fallback={<TechnologiesSectionLoading />}>
+        <TechnologiesSection />
+      </Suspense>
+    </main>
   );
 }

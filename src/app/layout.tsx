@@ -7,6 +7,8 @@ import '@/app/globals.css';
 import Header from '@/components/layout/Header';
 import type { PropsWithChildren } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Footer from '@/components/layout/Footer';
+import ContactCTASection from '@/components/layout/Footer/ContactCTASection';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -149,6 +151,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <div className="relative flex min-h-dvh flex-col">
             <Header />
             <main className="flex-1 pt-[105px]">{children}</main>
+            <ContactCTASection />
+            <Footer />
             <Analytics />
           </div>
         </ThemeProvider>
