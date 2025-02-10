@@ -60,10 +60,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-[90vh] overflow-hidden pt-20"
-    >
+    <section ref={containerRef} className="relative min-h-[90vh] overflow-hidden pt-20">
       {/* Grid pattern for additional texture */}
       <div
         className="absolute inset-0 opacity-[0.1]"
@@ -97,7 +94,7 @@ const HeroSection = () => {
             >
               Transform Your
               <div className="relative mt-2 inline-flex flex-col">
-                <span className="relative z-10 bg-gradient-to-r from-accent to-accent/60 bg-clip-text text-transparent">
+                <span className="relative z-10 bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">
                   Digital Future
                 </span>
                 <motion.div
@@ -159,29 +156,35 @@ const HeroSection = () => {
                 >
                   <div
                     className={cn(
-                      'relative overflow-hidden rounded-2xl border border-border/50',
-                      'bg-background/50 p-6 text-center transition-all duration-300',
-                      'hover:border-accent/50 hover:shadow-lg'
+                      'relative h-full overflow-hidden rounded-2xl border border-border/50',
+                      'bg-background/50 p-8 text-center transition-all duration-300',
+                      'hover:border-accent/50 hover:shadow-lg will-change-transform',
+                      'hover:shadow-accent/5'
                     )}
                   >
                     {/* Content */}
-                    <div className="relative z-10">
+                    <div className="relative z-10 flex h-full flex-col items-center">
                       <div
                         className={cn(
-                          'mx-auto mb-4 inline-flex rounded-xl bg-accent/10 p-3',
-                          'text-accent transition-colors group-hover:bg-accent/20'
+                          'mb-6 inline-flex rounded-xl bg-accent/10 p-3',
+                          'text-accent transition-colors duration-300',
+                          'group-hover:scale-110 group-hover:bg-accent/20',
+                          'transform will-change-transform'
                         )}
                       >
                         <Icon className="h-6 w-6" />
                       </div>
-                      <h3 className="mb-2 text-lg font-semibold">{highlight.title}</h3>
+                      <h3 className="mb-3 text-lg font-semibold transition-colors duration-300 group-hover:text-accent">
+                        {highlight.title}
+                      </h3>
                       <p className="text-sm text-muted-foreground">{highlight.description}</p>
                     </div>
 
                     {/* Background Gradient */}
                     <div
                       className={cn(
-                        'absolute inset-0 -z-10 opacity-0 transition-opacity duration-300',
+                        'absolute inset-0 -z-10 opacity-0',
+                        'transition-opacity duration-500 ease-out',
                         'group-hover:opacity-100 bg-gradient-to-br',
                         highlight.gradient
                       )}

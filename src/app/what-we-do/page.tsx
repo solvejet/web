@@ -28,7 +28,7 @@ const FAQSection = dynamic(() => import('@/components/WhatWeDo/FAQSection'), {
 });
 
 export const metadata: Metadata = {
-  title: 'Our Services - Custom Software Development & Digital Solutions',
+  title: 'SolveJet | What We Do',
   description:
     'Explore our comprehensive range of software development services, from custom application development to digital transformation solutions.',
   openGraph: {
