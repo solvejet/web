@@ -1,7 +1,7 @@
 // src/components/Home/TechnologiesSection/index.tsx
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { techCategories } from '@/config/tech-data';
 import { cn } from '@/lib/utils';

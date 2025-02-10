@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Create new subscription
     try {
-      const newSubscription = await Newsletter.create({
+      await Newsletter.create({
         email,
         subscribed: true,
         subscribedAt: new Date(),

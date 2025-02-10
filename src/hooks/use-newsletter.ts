@@ -28,9 +28,6 @@ export const useNewsletter = () => {
         throw new Error('Failed to get CSRF token');
       }
 
-      // Get cookies for debugging
-      const cookies = document.cookie;
-
       // Make newsletter request
       const response = await fetchWithCsrf('/api/newsletter', {
         method: 'POST',
