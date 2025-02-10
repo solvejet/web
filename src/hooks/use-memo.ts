@@ -3,6 +3,9 @@
 
 import { useMemo, useCallback, type DependencyList, useRef, useEffect, useState } from 'react';
 
+const DEFAULT_MAX_SIZE = 100;
+const DEFAULT_TIMEOUT = 3600000;
+
 interface MemoOptions {
   maxSize?: number;
   timeout?: number;
@@ -13,55 +16,109 @@ interface CacheItem<T> {
   timestamp: number;
 }
 
+function getDependencyKey(dep: unknown): string {
+  if (dep === null) return 'null';
+  if (dep === undefined) return 'undefined';
+  if (typeof dep === 'string') return `str:${dep}`;
+  if (typeof dep === 'number') return `num:${dep}`;
+  if (typeof dep === 'boolean') return `bool:${dep}`;
+  if (typeof dep === 'function') return 'function';
+  if (dep instanceof Date) return `date:${dep.getTime()}`;
+
+  if (Array.isArray(dep)) {
+    return `array:[${dep.map((item) => getDependencyKey(item)).join(',')}]`;
+  }
+
+  if (dep && typeof dep === 'object') {
+    try {
+      const keys = Object.keys(dep).sort();
+      const safeKeys = keys.filter((key) => {
+        const val = dep[key as keyof typeof dep];
+        return (
+          val !== null &&
+          typeof val !== 'function' &&
+          typeof val !== 'object' &&
+          !('current' in dep) &&
+          !('$$typeof' in dep)
+        );
+      });
+
+      return `obj:{${safeKeys
+        .map((key) => {
+          const val = dep[key as keyof typeof dep];
+          return `${key}:${getDependencyKey(val)}`;
+        })
+        .join(',')}}`;
+    } catch {
+      return `obj:${Date.now()}`;
+    }
+  }
+
+  return 'unknown';
+}
+
+function createCacheKey(deps: DependencyList): string {
+  try {
+    return deps.map(getDependencyKey).join('|');
+  } catch {
+    return `fallback:${Date.now()}`;
+  }
+}
+
 export function useMemoWithCache<T>(
   factory: () => T,
-  dependencies: DependencyList,
-  options: MemoOptions = {}
+  deps: DependencyList,
+  { maxSize = DEFAULT_MAX_SIZE, timeout = DEFAULT_TIMEOUT }: MemoOptions = {
+    maxSize: DEFAULT_MAX_SIZE,
+    timeout: DEFAULT_TIMEOUT,
+  }
 ): T {
-  const { maxSize = 100, timeout = 3600000 } = options;
   const cache = useRef<Map<string, CacheItem<T>>>(new Map());
   const factoryRef = useRef(factory);
 
-  // Update factory ref when it changes
   useEffect(() => {
     factoryRef.current = factory;
   }, [factory]);
 
-  // Clear expired items from cache
   useEffect(() => {
-    const interval = setInterval(() => {
+    const cleanupInterval = setInterval(() => {
       const now = Date.now();
-      for (const [key, item] of cache.current.entries()) {
+      cache.current.forEach((item, key) => {
         if (now - item.timestamp > timeout) {
           cache.current.delete(key);
         }
-      }
+      });
     }, 60000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(cleanupInterval);
   }, [timeout]);
 
   return useMemo(() => {
-    const depsString = JSON.stringify(dependencies);
-    const cachedItem = cache.current.get(depsString);
-    const now = Date.now();
+    try {
+      const key = createCacheKey(deps);
+      const now = Date.now();
+      const cached = cache.current.get(key);
 
-    if (cachedItem && now - cachedItem.timestamp <= timeout) {
-      return cachedItem.value;
-    }
-
-    const result = factoryRef.current();
-
-    if (cache.current.size >= maxSize) {
-      const oldestKey = Array.from(cache.current.keys())[0];
-      if (oldestKey) {
-        cache.current.delete(oldestKey);
+      if (cached && now - cached.timestamp <= timeout) {
+        return cached.value;
       }
-    }
 
-    cache.current.set(depsString, { value: result, timestamp: now });
-    return result;
-  }, [dependencies, timeout, maxSize]);
+      const value = factoryRef.current();
+
+      if (cache.current.size >= maxSize) {
+        const oldestKey = Array.from(cache.current.keys())[0];
+        if (oldestKey) {
+          cache.current.delete(oldestKey);
+        }
+      }
+
+      cache.current.set(key, { value, timestamp: now });
+      return value;
+    } catch (error) {
+      console.warn('Cache operation failed:', error);
+      return factoryRef.current();
+    }
+  }, deps);
 }
 
 export function useDeepMemo<T>(value: T, dependencies: DependencyList): T {
@@ -106,7 +163,7 @@ export function useAsyncMemo<T>(
     } finally {
       setLoading(false);
     }
-  }, dependencies); // Use dependencies directly
+  }, dependencies);
 
   useEffect(() => {
     void refresh();
@@ -115,17 +172,16 @@ export function useAsyncMemo<T>(
   return { data, loading, error, refresh };
 }
 
-type DebouncedMemoOptions = {
+interface DebouncedMemoOptions extends MemoOptions {
   delay?: number;
   maxWait?: number;
-} & MemoOptions;
+}
 
 export function useDebouncedMemo<T>(
   factory: () => T,
   dependencies: DependencyList,
-  options: DebouncedMemoOptions = {}
+  { delay = 300, maxWait = 1000, ...options }: DebouncedMemoOptions = {}
 ): T {
-  const { delay = 300, maxWait = 1000, ...memoOptions } = options;
   const lastRun = useRef<number>(0);
   const timeout = useRef<NodeJS.Timeout>();
   const value = useRef<T>();
@@ -157,7 +213,7 @@ export function useDebouncedMemo<T>(
       return value.current ?? factoryRef.current();
     },
     dependencies,
-    memoOptions
+    options
   );
 }
 
@@ -171,11 +227,7 @@ export function useShallowMemo<T>(value: T, dependencies: DependencyList): T {
   return useMemo(() => valueRef.current, dependencies);
 }
 
-interface ComparableObject {
-  [key: string]: unknown;
-}
-
-export function useMemoCompare<T extends ComparableObject>(
+export function useMemoCompare<T extends Record<string, unknown>>(
   value: T,
   compare: (previous: T | undefined, current: T) => boolean
 ): T {

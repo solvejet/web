@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import {
-  Github,
+  Instagram,
   Linkedin,
   Twitter,
   Facebook,
@@ -42,7 +42,7 @@ const footerLinks = {
 };
 
 const socialLinks: SocialLink[] = [
-  { name: 'GitHub', icon: Github, href: 'https://github.com/solvejet' },
+  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/solvejet' },
   { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/solvejet' },
   { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/solvejet' },
   { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/solvejet' },
@@ -162,7 +162,7 @@ const Footer = () => {
     <motion.footer
       ref={footerRef}
       style={{ opacity, y }}
-      className="relative bg-background border-t border-border/50"
+      className="relative border-t border-border/50"
     >
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">

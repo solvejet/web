@@ -86,7 +86,7 @@ const AchievementsSection = () => {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-background py-24 lg:py-32">
+    <section className="relative overflow-hidden py-24 lg:py-32">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div

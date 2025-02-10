@@ -94,6 +94,24 @@ const config: Config = {
           '0%, 100%': { opacity: '0.4' },
           '50%': { opacity: '0.8' },
         },
+        'wave-slow': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1.5)' },
+          '25%': { transform: 'translate(10%, -5%) scale(1.5)' },
+          '50%': { transform: 'translate(-5%, 10%) scale(1.5)' },
+          '75%': { transform: 'translate(-10%, -5%) scale(1.5)' },
+        },
+        'wave-slower': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1.5)' },
+          '25%': { transform: 'translate(-10%, 5%) scale(1.5)' },
+          '50%': { transform: 'translate(5%, -10%) scale(1.5)' },
+          '75%': { transform: 'translate(10%, 5%) scale(1.5)' },
+        },
+        'wave-slowest': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1.5)' },
+          '25%': { transform: 'translate(5%, 10%) scale(1.5)' },
+          '50%': { transform: 'translate(-10%, -5%) scale(1.5)' },
+          '75%': { transform: 'translate(-5%, -10%) scale(1.5)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out',
@@ -101,6 +119,9 @@ const config: Config = {
         'slide-in-from-top': 'slide-in-from-top 0.3s ease-out',
         'slide-in-from-bottom': 'slide-in-from-bottom 0.3s ease-out',
         'scale-in': 'scale-in 0.2s ease-out',
+        'wave-slow': 'wave-slow 20s ease-in-out infinite',
+        'wave-slower': 'wave-slower 25s ease-in-out infinite',
+        'wave-slowest': 'wave-slowest 30s ease-in-out infinite',
       },
       // Safe Area
       padding: {

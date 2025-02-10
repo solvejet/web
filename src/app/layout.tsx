@@ -9,6 +9,7 @@ import type { PropsWithChildren } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Footer from '@/components/layout/Footer';
 import ContactCTASection from '@/components/layout/Footer/ContactCTASection';
+import GradientWaves from '@/components/ui/GradientWaves';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -149,8 +150,18 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body className={`${poppins.variable} min-h-dvh bg-background font-sans antialiased`}>
         <ThemeProvider defaultTheme="system" storageKey="solvejet-theme">
           <div className="relative flex min-h-dvh flex-col">
+            {/* Add FloatingShapes component */}
+            {/* <FloatingShapes
+              count={8}
+              className="fixed inset-0 z-[1]"
+              shapeClassName="opacity-30"
+              minSize={80}
+              maxSize={160}
+              gridOpacity={0.1}
+            /> */}
+            <GradientWaves intensity="medium" />
             <Header />
-            <main className="flex-1 pt-[105px]">{children}</main>
+            <main className="relative flex-1 pt-[105px]">{children}</main>
             <ContactCTASection />
             <Footer />
             <Analytics />
