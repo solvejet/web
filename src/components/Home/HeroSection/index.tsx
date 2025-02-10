@@ -1,3 +1,4 @@
+// src/components/Home/HeroSection/index.tsx
 'use client';
 
 import { useEffect, useRef, memo, useState } from 'react';

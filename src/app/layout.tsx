@@ -1,15 +1,17 @@
 // src/app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import { Poppins } from 'next/font/google';
-import Analytics from '@/components/Analytics';
 import { ThemeProvider } from '@/components/theme-provider';
 import '@/app/globals.css';
 import Header from '@/components/layout/Header';
-import type { PropsWithChildren } from 'react';
+import { lazy, type PropsWithChildren } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import Footer from '@/components/layout/Footer';
-import ContactCTASection from '@/components/layout/Footer/ContactCTASection';
 import GradientWaves from '@/components/ui/GradientWaves';
+
+// Lazy load non-critical components
+const Analytics = lazy(() => import('@/components/Analytics'));
+const Footer = lazy(() => import('@/components/layout/Footer'));
+const ContactCTASection = lazy(() => import('@/components/layout/Footer/ContactCTASection'));
 
 const poppins = Poppins({
   subsets: ['latin'],
