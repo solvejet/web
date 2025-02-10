@@ -1,14 +1,19 @@
-// src/components/Home/HeroSection/index.tsx
 'use client';
 
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import { gsap } from 'gsap';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { ArrowUpRight, Code, Rocket, Shield, Users } from 'lucide-react';
+import { ArrowUpRight, Code, Rocket, Shield, Users, type LucideIcon } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
 
-// Moved outside component to prevent recreation
-const features = [
+interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
+const features: Feature[] = [
   {
     icon: Code,
     title: 'Custom Development',
@@ -31,8 +36,7 @@ const features = [
   },
 ] as const;
 
-// Memoized Feature Card Component
-const FeatureCard = memo(({ feature }: { feature: (typeof features)[number] }) => {
+const FeatureCard = memo(({ feature }: { feature: Feature }) => {
   const Icon = feature.icon;
   return (
     <div className="feature-card group relative rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:shadow-lg will-change-transform">
@@ -47,7 +51,38 @@ const FeatureCard = memo(({ feature }: { feature: (typeof features)[number] }) =
 
 FeatureCard.displayName = 'FeatureCard';
 
-// Loading Component
+const BackgroundElements = memo(() => (
+  <>
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="gradient-orb absolute -left-20 top-20 h-72 w-72 rounded-full bg-gradient-to-r from-[#FF8BAE]/20 to-[#C400FF]/20 blur-2xl opacity-0 will-change-transform"
+        style={{ transform: 'scale(0.9)' }}
+      />
+      <div
+        className="gradient-orb absolute right-10 top-40 h-64 w-64 rounded-full bg-gradient-to-r from-[#00E1FF]/20 to-[#0047FF]/20 blur-2xl opacity-0 will-change-transform"
+        style={{ transform: 'scale(0.9)' }}
+      />
+      <div
+        className="gradient-orb absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-gradient-to-r from-[#FFB800]/20 to-[#FF5C00]/20 blur-2xl opacity-0 will-change-transform"
+        style={{ transform: 'scale(0.9)' }}
+      />
+    </div>
+    <div
+      className="absolute inset-0 opacity-[0.15] pointer-events-none"
+      style={{
+        backgroundImage: 'radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0)',
+        backgroundSize: '40px 40px',
+        maskImage: 'linear-gradient(to bottom, black 80%, transparent)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent)',
+        willChange: 'mask-image',
+      }}
+      aria-hidden="true"
+    />
+  </>
+));
+
+BackgroundElements.displayName = 'BackgroundElements';
+
 export function HeroSkeleton() {
   return (
     <div className="min-h-[85vh] animate-pulse">
@@ -66,6 +101,7 @@ export function HeroSkeleton() {
 }
 
 const HeroSection = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const animationRef = useRef<gsap.Context | null>(null);
@@ -73,25 +109,43 @@ const HeroSection = () => {
   useEffect(() => {
     if (!sectionRef.current || typeof window === 'undefined') return;
 
-    // Create GSAP context for better cleanup
-    animationRef.current = gsap.context(() => {
-      // Initial state
-      gsap.set(['.hero-title', '.hero-description', '.cta-button', '.feature-card'], {
-        opacity: 1,
-        y: 0,
-      });
+    setIsLoaded(true);
 
-      // Animate background elements
+    animationRef.current = gsap.context(() => {
+      gsap.fromTo(
+        ['.hero-title', '.hero-description', '.cta-button'],
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.2,
+          duration: 0.8,
+          ease: 'power2.out',
+        }
+      );
+
+      gsap.fromTo(
+        '.feature-card',
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.6,
+          ease: 'power2.out',
+          delay: 0.5,
+        }
+      );
+
       gsap.to('.gradient-orb', {
-        opacity: 1,
+        opacity: 0.8,
         scale: 1,
-        duration: 1,
+        duration: 1.5,
         ease: 'power2.out',
-        stagger: 0.1,
+        stagger: 0.2,
       });
     }, sectionRef);
 
-    // Cleanup function
     return () => {
       if (animationRef.current) {
         animationRef.current.revert();
@@ -105,38 +159,10 @@ const HeroSection = () => {
       className="relative min-h-[85vh] overflow-hidden px-4 pt-16"
       aria-label="Hero section"
     >
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="gradient-orb absolute -left-20 top-20 h-72 w-72 rounded-full bg-gradient-to-r from-[#FF8BAE]/20 to-[#C400FF]/20 blur-2xl opacity-0 will-change-transform"
-          style={{ transform: 'scale(0.9)' }}
-        />
-        <div
-          className="gradient-orb absolute right-10 top-40 h-64 w-64 rounded-full bg-gradient-to-r from-[#00E1FF]/20 to-[#0047FF]/20 blur-2xl opacity-0 will-change-transform"
-          style={{ transform: 'scale(0.9)' }}
-        />
-        <div
-          className="gradient-orb absolute bottom-20 left-1/3 h-80 w-80 rounded-full bg-gradient-to-r from-[#FFB800]/20 to-[#FF5C00]/20 blur-2xl opacity-0 will-change-transform"
-          style={{ transform: 'scale(0.9)' }}
-        />
-      </div>
+      <BackgroundElements />
 
-      {/* Grid Pattern Overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.15] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0)',
-          backgroundSize: '40px 40px',
-          maskImage: 'linear-gradient(to bottom, black 80%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent)',
-          willChange: 'mask-image',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Main Content */}
       <div className="relative mx-auto max-w-6xl">
-        <div className="hero-content text-center">
+        <div className={cn('hero-content text-center', !isLoaded && 'opacity-0')}>
           <h1 className="hero-title text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Crafting Digital Excellence with{' '}
             <span className="block bg-gradient-to-r from-[#FF8BAE] to-[#0047FF] bg-clip-text text-transparent">
@@ -150,7 +176,6 @@ const HeroSection = () => {
             but redefine them.
           </p>
 
-          {/* CTA Buttons */}
           <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               href="/contact"
@@ -173,7 +198,6 @@ const HeroSection = () => {
             </Button>
           </div>
 
-          {/* Features Grid */}
           <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
               <FeatureCard key={feature.title} feature={feature} />

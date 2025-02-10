@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' blob: data:",
       "font-src 'self' data:",
-      "connect-src 'self' https://api.solvejet.net",
+      "connect-src 'self' https://solvejet.net",
       "form-action 'self'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
