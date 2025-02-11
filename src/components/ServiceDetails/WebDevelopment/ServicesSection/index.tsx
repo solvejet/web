@@ -112,9 +112,9 @@ const WebServicesSection = () => {
                 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl"
               >
                 Web Development
-                <span className="mt-2 block bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip text-transparent">
+                <div className="mt-2 block bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">
                   Solutions
-                </span>
+                </div>
               </motion.h2>
 
               <motion.p
