@@ -140,12 +140,6 @@ const WebDevHero = () => {
                 <span className="relative z-10 bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">
                   Digital Presence
                 </span>
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8, ease: 'circOut' }}
-                  className="absolute -bottom-2 left-0 right-0 h-4 origin-left bg-accent/10"
-                />
               </span>
             </motion.h1>
 

@@ -46,3 +46,11 @@ export function TechnologiesSectionLoading() {
     </div>
   );
 }
+
+export function FAQLoading() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-[600px] bg-accent/5" />
+    </div>
+  );
+}

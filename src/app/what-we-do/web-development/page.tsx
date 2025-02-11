@@ -2,16 +2,39 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { SEO } from '@/components/seo';
-import {
-  ServiceHeroLoading,
-} from '@/components/loading/service-loading';
+import { FAQLoading, ServiceHeroLoading, ServicesLoading } from '@/components/loading/service-loading';
 import WebDevHero from '@/components/ServiceDetails/WebDevelopment/HeroSection';
-// import WhyChooseSection from '@/components/ServiceDetails/SharedSections/WhyChooseSection';
-// import ProcessSection from '@/components/ServiceDetails/SharedSections/ProcessSection';
-// import WebServicesSection from '@/components/ServiceDetails/WebDevelopment/ServicesSection';
-// import IndustriesSection from '@/components/ServiceDetails/SharedSections/IndustriesSection';
-// import TechnologySection from '@/components/ServiceDetails/SharedSections/TechnologySection';
-// import WebFAQSection from '@/components/ServiceDetails/WebDevelopment/FAQSection';
+import dynamic from 'next/dynamic';
+import WhyChooseSection from '@/components/ServiceDetails/SharedSections/WhyChooseSection';
+import WebDevFAQSection from '@/components/ServiceDetails/WebDevelopment/FAQSection';
+
+const WebServicesSection = dynamic(
+  () => import('@/components/ServiceDetails/WebDevelopment/ServicesSection'),
+  {
+    ssr: true,
+  }
+);
+
+const ProcessSection = dynamic(
+  () => import('@/components/ServiceDetails/SharedSections/ProcessSection'),
+  {
+    ssr: true,
+  }
+);
+
+const IndustriesSection = dynamic(
+  () => import('@/components/ServiceDetails/SharedSections/IndustriesSection'),
+  {
+    ssr: true,
+  }
+);
+
+const TechnologySection = dynamic(
+  () => import('@/components/ServiceDetails/SharedSections/TechnologySection'),
+  {
+    ssr: true,
+  }
+);
 
 export const metadata: Metadata = {
   title: 'Web Development Services - Modern Solutions for Digital Success',
@@ -59,25 +82,25 @@ export default function WebDevelopmentPage() {
           <WebDevHero />
         </Suspense>
 
-        {/* <WhyChooseSection />
+        <WhyChooseSection />
 
         <ProcessSection />
 
         <Suspense fallback={<ServicesLoading />}>
-          <WebServicesSection services={webDevelopmentContent.services} />
+          <WebServicesSection />
         </Suspense>
 
         <IndustriesSection />
 
         <TechnologySection
-          frameworks={webDevelopmentContent.frameworks}
-          frontendTech={webDevelopmentContent.frontendTechnologies}
-          backendTech={webDevelopmentContent.backendTechnologies}
+          title="Our Technology Stack"
+          subtitle="We use cutting-edge technologies to build robust web applications"
+          selectedCategories={['frontend', 'backend', 'database', 'cloud']}
         />
 
         <Suspense fallback={<FAQLoading />}>
-          <WebFAQSection faqs={webDevelopmentContent.faqs} />
-        </Suspense> */}
+          <WebDevFAQSection />
+        </Suspense>
       </main>
     </>
   );
