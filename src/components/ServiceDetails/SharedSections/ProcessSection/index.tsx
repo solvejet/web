@@ -22,14 +22,6 @@ interface ProcessSectionProps {
   steps?: ProcessStep[];
 }
 
-const defaultColors = [
-  { from: 'blue-500', to: 'blue-600' },
-  { from: 'indigo-500', to: 'indigo-600' },
-  { from: 'purple-500', to: 'purple-600' },
-  { from: 'pink-500', to: 'pink-600' },
-  { from: 'red-500', to: 'red-600' },
-] as const;
-
 const defaultSteps: ProcessStep[] = [
   {
     icon: FileSearch,
@@ -74,22 +66,8 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
     offset: ['start center', 'end center'],
   });
 
-  // Helper function to get color with fallback
-  const getStepColor = (step: ProcessStep, index: number): { from: string; to: string } => {
-    if (step.color) {
-      return step.color;
-    }
-    // Safely get default color, falling back to first color if index is out of bounds
-    const defaultColorIndex = index % defaultColors.length;
-    const defaultColor = defaultColors[defaultColorIndex] || defaultColors[0];
-    return {
-      from: defaultColor.from,
-      to: defaultColor.to,
-    };
-  };
-
   return (
-    <section ref={containerRef} className="relative overflow-hidden py-24 lg:py-32">
+    <section ref={containerRef} className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
       <div className="container relative z-10 mx-auto px-4">
         {/* Section Header */}
         <motion.div
@@ -111,7 +89,7 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl"
+            className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
           >
             {title}
           </motion.h2>
@@ -120,17 +98,16 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-lg text-muted-foreground"
+            className="mt-4 text-base text-muted-foreground sm:text-lg"
           >
             {subtitle}
           </motion.p>
         </motion.div>
 
-        {/* Timeline Steps */}
-        <div className="relative mt-20">
-          {/* Central Line Container - Extends full height */}
-          <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 transform">
-            {/* Animated Line Fill */}
+        {/* Timeline */}
+        <div className="relative mt-16 sm:mt-20">
+          {/* Central Line - Hidden on mobile */}
+          <div className="absolute left-1/2 top-0 hidden h-full w-0.5 -translate-x-1/2 transform sm:block">
             <motion.div
               className="h-full w-full bg-gradient-to-b from-accent/40 via-accent/60 to-accent/40"
               style={{
@@ -141,11 +118,16 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
           </div>
 
           {/* Steps */}
-          <div className="relative space-y-24">
+          <div className="relative space-y-8 sm:space-y-16">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isEven = index % 2 === 0;
-              const stepColor = getStepColor(step, index);
+              // Safely get color with fallback
+              const defaultColor = defaultSteps[index % defaultSteps.length]?.color ?? {
+                from: 'blue-500',
+                to: 'blue-600',
+              };
+              const stepColor = step.color ?? defaultColor;
 
               return (
                 <motion.div
@@ -158,17 +140,18 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
                 >
                   <div
                     className={cn(
-                      'flex items-center gap-8',
-                      isEven ? 'flex-row' : 'flex-row-reverse'
+                      'flex flex-col items-center gap-8',
+                      'sm:flex-row sm:gap-16',
+                      isEven ? 'sm:flex-row' : 'sm:flex-row-reverse'
                     )}
                   >
                     {/* Content Box */}
-                    <div className="w-[calc(50%-2rem)]">
+                    <div className="w-full sm:w-[calc(50%-4rem)]">
                       <motion.div
                         whileHover={{ scale: 1.02 }}
                         className={cn(
                           'group relative overflow-hidden rounded-2xl',
-                          'border border-border/50 bg-background/50 p-8',
+                          'border border-border/50 bg-background/50 p-6 sm:p-8',
                           'backdrop-blur-sm transition-all duration-300',
                           'hover:border-accent/40 hover:shadow-2xl hover:shadow-accent/5'
                         )}
@@ -177,34 +160,34 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
                           <motion.div
                             whileHover={{ scale: 1.1, rotate: 5 }}
                             className={cn(
-                              'mb-6 inline-flex h-16 w-16 items-center justify-center rounded-xl',
+                              'mb-6 inline-flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl',
                               'bg-gradient-to-br transition-transform duration-300',
-                              `from-${stepColor.from} to-${stepColor.to}`,
+                              `from-${stepColor?.from ?? 'blue-500'} to-${stepColor?.to ?? 'blue-600'}`,
                               'bg-opacity-20'
                             )}
                           >
-                            <Icon className="h-8 w-8 text-accent" />
+                            <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
                           </motion.div>
-                          <h3 className="text-xl font-semibold">{step.title}</h3>
-                          <p className="mt-2 text-muted-foreground">{step.description}</p>
+                          <h3 className="text-lg sm:text-xl font-semibold">{step.title}</h3>
+                          <p className="mt-2 text-sm sm:text-base text-muted-foreground">
+                            {step.description}
+                          </p>
                         </div>
 
-                        {/* Hover Effects */}
+                        {/* Background Effects */}
                         <div
                           className={cn(
                             'absolute inset-0 -z-10 opacity-0 transition-opacity duration-300',
                             'group-hover:opacity-100',
                             'bg-gradient-to-br',
-                            `from-${stepColor.from}/10 to-transparent`
+                            `from-${stepColor?.from ?? 'blue-500'}/10 to-transparent`
                           )}
                         />
-
-                        <div className="absolute -right-4 -top-4 h-20 w-20 rotate-12 transform rounded-xl bg-accent/5 opacity-0 transition-all duration-500 group-hover:opacity-100" />
                       </motion.div>
                     </div>
 
-                    {/* Timeline Node */}
-                    <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+                    {/* Timeline Node - Hidden on mobile */}
+                    <div className="hidden sm:relative sm:flex sm:h-8 sm:w-8 sm:shrink-0 sm:items-center sm:justify-center">
                       <motion.div
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
@@ -223,30 +206,18 @@ const ProcessSection: React.FC<ProcessSectionProps> = ({
                     </div>
 
                     {/* Step Number */}
-                    <div className="w-[calc(50%-2rem)] flex items-center justify-center relative">
+                    <div className="hidden sm:block sm:w-[calc(50%-4rem)] sm:relative">
                       <motion.div
                         initial={{ opacity: 0, scale: 0.5 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="relative"
+                        className="relative text-center"
                       >
-                        {/* Background number for depth */}
                         <span
                           className={cn(
-                            'absolute inset-0 text-[120px] font-bold leading-none',
-                            'bg-gradient-to-br bg-clip-text text-transparent blur-sm',
-                            `from-${stepColor.from}/20 to-${stepColor.to}/20`
-                          )}
-                        >
-                          {(index + 1).toString().padStart(2, '0')}
-                        </span>
-
-                        {/* Main number */}
-                        <span
-                          className={cn(
-                            'relative text-[120px] font-bold leading-none block',
+                            'text-6xl sm:text-8xl font-bold leading-none',
                             'bg-gradient-to-br bg-clip-text text-transparent',
-                            `from-${stepColor.from}/40 to-${stepColor.to}/40`
+                            `from-${stepColor?.from ?? 'blue-500'}/40 to-${stepColor?.to ?? 'blue-600'}/40`
                           )}
                         >
                           {(index + 1).toString().padStart(2, '0')}
