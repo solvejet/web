@@ -61,36 +61,46 @@ const FeaturedIndustries = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative"
+                className="group relative h-full"
               >
-                <Link href={`/industries/${industry.id}`}>
+                <Link href={`/industries/${industry.id}`} className="block h-full">
                   <div
                     className={cn(
-                      'relative overflow-hidden rounded-2xl border border-border/50',
+                      'relative h-full overflow-hidden rounded-2xl border border-border/50',
                       'bg-background/50 p-8 transition-all duration-300',
-                      'hover:border-accent/50 hover:shadow-lg'
+                      'hover:border-accent/50 hover:shadow-lg',
+                      'flex flex-col'
                     )}
                   >
                     {/* Industry Icon */}
                     <div
                       className={cn(
                         'mb-6 inline-flex rounded-xl bg-accent/10 p-3',
-                        'text-accent transition-colors group-hover:bg-accent/20'
+                        'text-accent transition-colors group-hover:bg-accent/20',
+                        'self-start'
                       )}
                     >
                       <Icon className="h-6 w-6" />
                     </div>
 
                     {/* Industry Content */}
-                    <h3 className="mb-3 text-xl font-semibold tracking-tight">{industry.title}</h3>
-                    <p className="mb-6 text-muted-foreground">{industry.fullDescription}</p>
+                    <div className="flex-grow">
+                      <h3 className="mb-3 text-xl font-semibold tracking-tight">
+                        {industry.title}
+                      </h3>
+                      <p className="mb-6 line-clamp-4 text-muted-foreground">
+                        {industry.fullDescription}
+                      </p>
+                    </div>
 
                     {/* Stats Grid */}
                     <div className="mb-6 grid grid-cols-3 gap-4">
                       {industry.stats.map((stat, i) => (
                         <div key={i} className="text-center">
                           <div className="text-lg font-semibold text-accent">{stat.value}</div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
+                          <div className="text-xs text-muted-foreground whitespace-nowrap">
+                            {stat.label}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -99,7 +109,8 @@ const FeaturedIndustries = () => {
                     <div
                       className={cn(
                         'inline-flex items-center text-sm font-medium',
-                        'text-accent transition-colors group-hover:text-accent/80'
+                        'text-accent transition-colors group-hover:text-accent/80',
+                        'mt-auto'
                       )}
                     >
                       Learn more

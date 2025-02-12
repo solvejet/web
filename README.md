@@ -1,54 +1,88 @@
-# SolveJet - Next.js Enterprise Application Template
+# SolveJet - Enterprise Software Development Company
 
-A fully optimized Next.js application template with built-in SEO, analytics, performance monitoring, and security features.
+![SolveJet Logo](public/solvejet.png)
 
-## 🚀 Features
+A modern, high-performance website built with Next.js 14, TypeScript, and Tailwind CSS. This project showcases enterprise-level software development services with a focus on performance, accessibility, and user experience.
 
-- **Performance Optimization**
+## ✨ Features
 
-  - Automated performance monitoring and reporting
-  - Image optimization with lazy loading
-  - Font optimization with next/font
-  - Client-side performance metrics collection
+- **🚀 Performance Optimized**
 
-- **SEO & Analytics**
+  - Dynamic imports and code splitting
+  - Optimized image loading and caching
+  - Lazy-loaded components
+  - Efficient bundle size management
 
-  - Built-in SEO components and metadata management
-  - Google Analytics 4 integration
-  - Google Tag Manager support
-  - LinkedIn Insight Tag integration
-  - Custom analytics events tracking
-  - UTM parameter tracking
+- **🎨 Modern Design**
 
-- **Security**
+  - Responsive layouts
+  - Dark/Light mode support
+  - Smooth animations with Framer Motion
+  - Custom UI components
+
+- **🔒 Security Features**
 
   - CSRF protection
+  - Security headers
   - Rate limiting
-  - Secure headers configuration
-  - Content Security Policy (CSP)
-  - Cross-Origin Resource Sharing (CORS)
-  - MongoDB connection security
+  - API protection
+  - Content Security Policy
 
-- **Development Features**
-  - TypeScript support
-  - ESLint configuration
-  - Prettier configuration
-  - Stylelint setup
-  - Tailwind CSS with dark mode support
-  - Modular component architecture
+- **📊 Analytics Integration**
 
-## 📋 Prerequisites
+  - Custom analytics implementation
+  - Performance tracking
+  - Campaign monitoring
+  - User behavior analysis
 
-- Node.js 18.x or higher
+- **🌐 SEO Optimized**
+  - Meta tags management
+  - Structured data
+  - OpenGraph support
+  - Sitemap generation
+
+## 🛠 Tech Stack
+
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Animation:** Framer Motion
+- **State Management:** React Hooks
+- **Database:** MongoDB
+- **Analytics:** Custom implementation
+- **Icons:** Lucide Icons
+- **Deployment:** Vercel
+
+## 📦 Project Structure
+
+```
+src/
+├── app/                # Next.js app directory
+├── components/         # React components
+├── config/            # Configuration files
+├── hooks/             # Custom React hooks
+├── lib/              # Utility libraries
+├── middleware/       # Next.js middleware
+├── models/           # MongoDB models
+├── schemas/          # Validation schemas
+├── types/            # TypeScript types
+└── utils/            # Utility functions
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
 - MongoDB database
-- npm or yarn package manager
 
-## 🛠 Installation
+### Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/solvejet/web.git
+git clone https://github.com/yourusername/solvejet.git
 cd solvejet
 ```
 
@@ -66,22 +100,7 @@ yarn install
 cp .env.example .env.local
 ```
 
-4. Update `.env.local` with your configuration:
-
-```env
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# MongoDB
-MONGODB_URI=your_mongodb_uri
-
-# Analytics
-NEXT_PUBLIC_GA_ID=your_ga_id
-NEXT_PUBLIC_GTM_ID=your_gtm_id
-NEXT_PUBLIC_LINKEDIN_ID=your_linkedin_id
-```
-
-5. Run the development server:
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -89,127 +108,60 @@ npm run dev
 yarn dev
 ```
 
-## 🏗 Project Structure
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```
-src/
-├── app/                   # App router pages and API routes
-├── components/           # Reusable components
-│   ├── ui/              # UI components
-│   └── analytics/       # Analytics components
-├── hooks/               # Custom React hooks
-├── lib/                 # Utility libraries
-├── middleware/          # Next.js middleware
-├── models/              # MongoDB models
-├── types/               # TypeScript types
-└── utils/               # Utility functions
-```
+## 🔧 Scripts
 
-## 📊 Analytics Setup
+- `dev` - Start development server
+- `build` - Build production bundle
+- `start` - Start production server
+- `lint` - Run ESLint
+- `lint:fix` - Fix ESLint errors
+- `lint:css` - Run Stylelint
+- `format` - Format code with Prettier
+- `type-check` - Run TypeScript type checking
 
-The project includes support for multiple analytics platforms:
+## 🔒 Environment Variables
 
-### Google Analytics 4
-
-1. Create a GA4 property
-2. Add your Measurement ID to `.env.local`
-3. Analytics will automatically start tracking
-
-### Google Tag Manager
-
-1. Create a GTM container
-2. Add your Container ID to `.env.local`
-3. Tags will be managed through GTM interface
-
-### LinkedIn Insight Tag
-
-1. Get your LinkedIn Partner ID
-2. Add it to `.env.local`
-3. LinkedIn conversion tracking will be enabled
-
-## 🔒 Security Features
-
-### CSRF Protection
-
-- Automatic CSRF token generation
-- Token validation for all POST/PUT/DELETE requests
-- Secure cookie handling
-
-### Rate Limiting
-
-- Configurable rate limits per endpoint
-- Memory-based rate limiting
-- IP-based tracking
-
-### Content Security Policy
-
-- Strict CSP rules configured
-- Inline script handling
-- Resource loading restrictions
-
-## 💻 Development
-
-### Available Scripts
+Required environment variables:
 
 ```bash
-# Development
-npm run dev          # Start development server
-npm run build       # Build production application
-npm run start       # Start production server
-
-# Linting and Formatting
-npm run lint        # Run ESLint
-npm run lint:fix    # Fix ESLint issues
-npm run lint:css    # Run Stylelint
-npm run format      # Run Prettier
-
-# Type Checking
-npm run type-check  # Run TypeScript compiler
+NEXT_PUBLIC_APP_URL=
+MONGODB_URI=
+NEXT_PUBLIC_GOOGLE_VERIFICATION=
+NEXT_PUBLIC_YANDEX_VERIFICATION=
 ```
 
-### Code Quality Tools
+## 🎯 Core Features Implementation
 
-- **ESLint**: JavaScript/TypeScript linting
-- **Prettier**: Code formatting
-- **Stylelint**: CSS/SCSS linting
-- **TypeScript**: Static type checking
+### Analytics
 
-### Performance Monitoring
+- Custom analytics implementation with event tracking
+- Performance monitoring
+- Campaign tracking
+- User behavior analysis
 
-The application includes built-in performance monitoring for:
+### Security
 
-- Core Web Vitals
-- Custom performance metrics
-- User interactions
-- Page load times
+- CSRF protection middleware
+- Rate limiting
+- API security headers
+- Content Security Policy
+- XSS protection
 
-## 🚀 Deployment
+### Performance
 
-1. Build the application:
-
-```bash
-npm run build
-```
-
-2. Start the production server:
-
-```bash
-npm run start
-```
-
-### Deployment Considerations
-
-- Set up proper environment variables
-- Configure MongoDB connection string
-- Set up proper security headers
-- Enable HTTPS
-- Configure proper CORS settings
+- Image optimization
+- Code splitting
+- Bundle optimization
+- Lazy loading
+- Caching strategies
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-## 🤝 Contributing
+## 👥 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -217,21 +169,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 📬 Contact
+
+- Website: [https://solvejet.net](https://solvejet.net)
+- GitHub: [@karansxa](https://github.com/karansxa)
+
 ## 🙏 Acknowledgments
 
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [MongoDB](https://www.mongodb.com/)
-- [TypeScript](https://www.typescriptlang.org/)
+- Next.js team for the amazing framework
+- Vercel for hosting and deployment
+- All contributors who have helped this project grow
 
-## ⚠️ Known Issues
+---
 
-- Web Vitals reporting may require a CSRF token refresh in some cases
-- Image optimization requires proper configuration in production
-- Rate limiting may need adjustment based on your usage patterns
-
-## 📫 Contact
-
-- Website: [solvejet.net](https://solvejet.net)
-- Twitter: [@karansxa](https://twitter.com/karansxa)
-- Email: karan@solvejet.net
+Made with ❤️ by [SolveJet](https://solvejet.net)
