@@ -12,7 +12,7 @@ import HamburgerIcon from '@/components/ui/HamburgerIcon';
 import MobileMenu from './MobileMenu';
 import { AnimatePresence } from 'framer-motion';
 
-export type MenuId = 'what-we-do' | 'industries' | 'technologies' | 'company' | 'case-studies';
+export type MenuId = 'what-we-do' | 'industries' | 'company' | 'case-studies';
 
 interface NavLinkProps {
   href: string;
@@ -81,7 +81,6 @@ export default function Navbar({ openMenu, onMenuOpenAction, onMouseLeaveAction 
     () => [
       { id: 'what-we-do' as const, title: 'What We Do', href: '/what-we-do' },
       { id: 'industries' as const, title: 'Industries', href: '/industries' },
-      { id: 'technologies' as const, title: 'Technology', href: '/technologies' },
       { id: 'company' as const, title: 'Company', href: '/company' },
       { id: 'case-studies' as const, title: 'Case Studies', href: '/case-studies' },
     ],

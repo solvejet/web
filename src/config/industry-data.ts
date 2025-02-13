@@ -11,45 +11,22 @@ import {
   Globe,
   Cloud,
   Users2,
-  type LucideIcon,
 } from 'lucide-react';
+import type { Industry } from '@/types/industry';
 
-export interface IndustryStats {
-  value: string;
-  label: string;
-}
-
-export interface IndustrySolution {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  features: string[];
-}
-
-export interface IndustryTechnology {
-  category: string;
-  items: string[];
-}
-
-export interface Industry {
-  id: string;
-  title: string;
-  icon: LucideIcon;
-  shortDescription: string;
-  fullDescription: string;
-  gradient: string;
-  stats: IndustryStats[];
-  solutions: IndustrySolution[];
-  technologies: IndustryTechnology[];
-  keyFeatures: string[];
-  caseStudyStats: IndustryStats[];
-  image?: string;
-}
+const TECH_CATEGORIES = {
+  FRONTEND: 'Frontend',
+  BACKEND: 'Backend',
+  DATABASE: 'Database',
+  CLOUD: 'Cloud',
+  DEVOPS: 'DevOps',
+  MOBILE: 'Mobile',
+} as const;
 
 export const industries: Industry[] = [
   {
     id: 'real-estate',
-    title: 'Real Estate & PropTech',
+    title: 'Real Estate',
     icon: Building2,
     shortDescription:
       'Digital solutions for property management, smart buildings, and real estate operations.',
@@ -99,16 +76,20 @@ export const industries: Industry[] = [
     ],
     technologies: [
       {
-        category: 'Frontend',
-        items: ['React', 'Next.js', 'Vue.js'],
+        category: TECH_CATEGORIES.FRONTEND,
+        items: ['React', 'Next.js', 'Vue.js', 'Angular', 'TypeScript'],
       },
       {
-        category: 'Backend',
-        items: ['Node.js', 'Python', 'Java'],
+        category: TECH_CATEGORIES.BACKEND,
+        items: ['Node.js', 'Python', 'Java', 'Spring Boot'],
       },
       {
-        category: 'IoT & Integration',
-        items: ['AWS IoT', 'Azure IoT', 'MQTT'],
+        category: TECH_CATEGORIES.DATABASE,
+        items: ['PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch'],
+      },
+      {
+        category: TECH_CATEGORIES.CLOUD,
+        items: ['AWS', 'Azure', 'Google Cloud', 'Kubernetes'],
       },
     ],
     keyFeatures: [
@@ -175,16 +156,20 @@ export const industries: Industry[] = [
     ],
     technologies: [
       {
-        category: 'IoT & Sensors',
-        items: ['Industrial IoT', 'SCADA', 'PLC Integration'],
+        category: TECH_CATEGORIES.FRONTEND,
+        items: ['React', 'Vue.js', 'Angular', 'D3.js'],
       },
       {
-        category: 'Analytics',
-        items: ['Machine Learning', 'Predictive Analytics', 'Big Data'],
+        category: TECH_CATEGORIES.BACKEND,
+        items: ['Python', 'Java', 'C++', 'Go'],
       },
       {
-        category: 'Integration',
-        items: ['ERP Systems', 'MES', 'Quality Management'],
+        category: TECH_CATEGORIES.DATABASE,
+        items: ['TimescaleDB', 'InfluxDB', 'MongoDB', 'Redis'],
+      },
+      {
+        category: TECH_CATEGORIES.CLOUD,
+        items: ['AWS IoT', 'Azure IoT', 'Google Cloud IoT'],
       },
     ],
     keyFeatures: [
@@ -250,16 +235,20 @@ export const industries: Industry[] = [
     ],
     technologies: [
       {
-        category: 'E-commerce',
-        items: ['Shopify Plus', 'WooCommerce', 'Magento'],
+        category: TECH_CATEGORIES.FRONTEND,
+        items: ['React', 'Next.js', 'Vue.js', 'PWA'],
       },
       {
-        category: 'Payment',
-        items: ['Stripe', 'PayPal', 'Square'],
+        category: TECH_CATEGORIES.BACKEND,
+        items: ['Node.js', 'Python', 'Java', 'PHP'],
       },
       {
-        category: 'Analytics',
-        items: ['Google Analytics', 'Mixpanel', 'Segment'],
+        category: TECH_CATEGORIES.DATABASE,
+        items: ['PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch'],
+      },
+      {
+        category: TECH_CATEGORIES.CLOUD,
+        items: ['AWS', 'Azure', 'CloudFlare', 'Vercel'],
       },
     ],
     keyFeatures: [
@@ -325,16 +314,20 @@ export const industries: Industry[] = [
     ],
     technologies: [
       {
-        category: 'Tracking',
-        items: ['GPS Systems', 'IoT Sensors', 'RFID'],
+        category: TECH_CATEGORIES.FRONTEND,
+        items: ['React', 'Next.js', 'TypeScript', 'Mapbox GL', 'Leaflet', 'D3.js'],
       },
       {
-        category: 'Management',
-        items: ['TMS', 'WMS', 'YMS'],
+        category: TECH_CATEGORIES.BACKEND,
+        items: ['Node.js', 'Python', 'Java', 'Go', 'Spring Boot'],
       },
       {
-        category: 'Analytics',
-        items: ['Predictive Analytics', 'BI Tools', 'Machine Learning'],
+        category: TECH_CATEGORIES.DATABASE,
+        items: ['PostgreSQL', 'MongoDB', 'Redis', 'TimescaleDB', 'Apache Cassandra'],
+      },
+      {
+        category: TECH_CATEGORIES.CLOUD,
+        items: ['AWS', 'Azure', 'Google Cloud', 'Kubernetes', 'Docker'],
       },
     ],
     keyFeatures: [
@@ -351,7 +344,7 @@ export const industries: Industry[] = [
     ],
   },
   {
-    id: 'travel',
+    id: 'travel-tourism',
     title: 'Travel & Tourism',
     icon: PlaneTakeoff,
     shortDescription: 'Digital solutions for modern travel and tourism businesses.',
@@ -400,16 +393,20 @@ export const industries: Industry[] = [
     ],
     technologies: [
       {
-        category: 'Booking Engine',
-        items: ['GDS Integration', 'API Management', 'Payment Gateway'],
+        category: TECH_CATEGORIES.FRONTEND,
+        items: ['React', 'Next.js', 'Vue.js', 'TypeScript', 'WebGL', 'Three.js'],
       },
       {
-        category: 'CRM',
-        items: ['Salesforce', 'Dynamic CRM', 'Custom CRM'],
+        category: TECH_CATEGORIES.BACKEND,
+        items: ['Node.js', 'Python', 'Java', 'GraphQL', 'RESTful APIs'],
       },
       {
-        category: 'Cloud',
-        items: ['AWS', 'Azure', 'Google Cloud'],
+        category: TECH_CATEGORIES.DATABASE,
+        items: ['PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch', 'Neo4j'],
+      },
+      {
+        category: TECH_CATEGORIES.CLOUD,
+        items: ['AWS', 'Azure', 'CloudFlare', 'Vercel', 'Netlify'],
       },
     ],
     keyFeatures: [
@@ -426,3 +423,35 @@ export const industries: Industry[] = [
     ],
   },
 ];
+
+// Helper functions to manipulate the industry data
+export const getIndustryById = (id: string): Industry | undefined =>
+  industries.find((industry) => industry.id === id);
+
+export const getFeaturedIndustries = (): Industry[] => industries.slice(0, 3);
+
+export const getIndustryDataMap = (): Record<string, Industry> =>
+  industries.reduce(
+    (acc, industry) => ({
+      ...acc,
+      [industry.id]: industry,
+    }),
+    {}
+  );
+
+// Export individual industries for direct access
+export const industryMap = getIndustryDataMap();
+
+// Export configuration for sections
+export const industrySections = {
+  featured: {
+    title: 'Featured Industries',
+    description: 'Explore our industry-specific solutions',
+    items: getFeaturedIndustries(),
+  },
+  all: {
+    title: 'All Industries',
+    description: 'Complete list of industries we serve',
+    items: industries,
+  },
+};

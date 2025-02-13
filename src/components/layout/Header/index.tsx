@@ -7,11 +7,10 @@ import Topbar from './Topbar';
 import Navbar from './Navbar';
 import WhatWeDo from './MegaMenu/WhatWeDo';
 import Industries from './MegaMenu/Industries';
-import Technologies from './MegaMenu/Technologies';
 import Company from './MegaMenu/Company';
 import SkipToContent from '../SkipToContent';
 
-export type MenuId = 'what-we-do' | 'industries' | 'technologies' | 'company' | 'case-studies';
+export type MenuId = 'what-we-do' | 'industries' | 'company' | 'case-studies';
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
@@ -72,7 +71,6 @@ export default function Header() {
                 <WhatWeDo isOpen={true} menuId={menuId} onClose={() => setOpenMenu(null)} />
               )}
               {openMenu === 'industries' && <Industries isOpen={true} menuId={menuId} />}
-              {openMenu === 'technologies' && <Technologies isOpen={true} menuId={menuId} />}
               {openMenu === 'company' && <Company isOpen={true} menuId={menuId} />}
             </div>
           </div>

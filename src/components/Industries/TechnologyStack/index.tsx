@@ -4,9 +4,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { industries } from '@/config/industry-data';
 import { useState } from 'react';
-import type { Industry } from '@/config/industry-data';
 import { cn } from '@/lib/utils';
 import { Code2, Server, Database, Cloud } from 'lucide-react';
+import type { Industry } from '@/types/industry';
 
 interface CategoryIconMap {
   [key: string]: typeof Code2;

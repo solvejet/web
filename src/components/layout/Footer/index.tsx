@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { CompanyLinks } from '@/config/company-data';
 import { whatWeDoItems } from '@/config/menu-data';
-import { techCategories } from '@/config/tech-data';
+import { industries } from '@/config/industry-data';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -34,9 +34,9 @@ import { useNewsletter } from '@/hooks/use-newsletter';
 
 const footerLinks = {
   services: whatWeDoItems.slice(0, 6),
-  technologies: techCategories.slice(0, 6).map((cat) => ({
-    title: cat.title,
-    href: `/technologies/${cat.id}`,
+  industries: industries.slice(0, 6).map((industry) => ({
+    title: industry.title,
+    href: `/industries/${industry.id}`,
   })),
   company: CompanyLinks,
 };
@@ -246,12 +246,12 @@ const Footer = () => {
                 </motion.ul>
               </AnimatedSection>
 
-              {/* Technologies */}
-              <AnimatedSection title="Technologies">
+              {/* Industries */}
+              <AnimatedSection title="Industries">
                 <motion.ul className="space-y-3" variants={staggerContainer}>
-                  {footerLinks.technologies.map((tech) => (
-                    <motion.li key={tech.href} variants={itemFadeIn}>
-                      <AnimatedLink href={tech.href}>{tech.title}</AnimatedLink>
+                  {footerLinks.industries.map((industry) => (
+                    <motion.li key={industry.href} variants={itemFadeIn}>
+                      <AnimatedLink href={industry.href}>{industry.title}</AnimatedLink>
                     </motion.li>
                   ))}
                 </motion.ul>
