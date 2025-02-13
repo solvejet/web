@@ -24,15 +24,7 @@ export default function HeroSection({ industry }: HeroSectionProps) {
   return (
     <section className="relative min-h-[90vh] overflow-hidden pt-20">
       {/* Background Pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.1]"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0)',
-          backgroundSize: '40px 40px',
-          maskImage: 'linear-gradient(to bottom, black 50%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent)',
-        }}
-      />
+      <div className="absolute inset-0 opacity-[0.1]" />
 
       <div className="container relative mx-auto px-4">
         <div className="relative z-10">
